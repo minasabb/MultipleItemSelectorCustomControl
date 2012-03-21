@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleItemSelectorCustomControl", "TagBoxCustomControl\MultipleItemSelectorCustomControl.csproj", "{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}.Debug|x86.ActiveCfg = Debug|x86
+		{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}.Debug|x86.Build.0 = Debug|x86
+		{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}.Release|x86.ActiveCfg = Release|x86
+		{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
