@@ -61,16 +61,21 @@
 						                Background="{StaticResource ReverseMetroGradientBrush}"
                                         BorderThickness="1">
                                         <StackPanel
+                                            KeyboardNavigation.IsTabStop="False"
                                             Orientation="Horizontal">
-                                            <ContentPresenter x:Name="contentPresenter" 
+                                            <ContentPresenter
+                                                KeyboardNavigation.IsTabStop="False"
+                                                x:Name="contentPresenter" 
 								                Margin="10,0" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                                             <Button
+                                                KeyboardNavigation.IsTabStop="False"
                                                 x:Name="PART_TagButton"
                                                 Content="{Binding}"
                                                 Style="{DynamicResource SelectorDeleteButtonStyle}" />
                                         </StackPanel>
                                     </Border>
                                     <TextBox
+                                        KeyboardNavigation.IsTabStop="False"
                                         VerticalAlignment="Center"
                                         x:Name="PART_NewItem"
                                         Template="{StaticResource NewItemFocusedTemplate}"

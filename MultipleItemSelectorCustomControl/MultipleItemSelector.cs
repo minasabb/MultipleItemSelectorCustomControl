@@ -14,13 +14,13 @@ namespace MultipleItemSelectorCustomControl
         private const string PartNewItem = "PART_NewItem";
         private const string PartItemsBorder = "PART_itemsBorder";
         private const int MaxNumBackKeyCount = 2;
-        private int _backCount;
+        private int _backKeyCount;
+        private int _itemsCount;
+
         public MultipleItemSelector()
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorStyle");
-            Loaded+=MultipleItemSelectorLoaded; 
-            GotFocus+=MultipleItemSelectorGotFocus;
-         
+            GotFocus += MultipleItemSelectorGotFocus;
         }
 
         void MultipleItemSelectorGotFocus(object sender, RoutedEventArgs e)
@@ -29,7 +29,7 @@ namespace MultipleItemSelectorCustomControl
             FindButtonControl(PartTagButton);
         }
 
-        void MultipleItemSelectorLoaded(object sender, RoutedEventArgs e)
+        void AddBorderEvents()
         {
             var mainBorder = GetTemplateChild(PartItemsBorder) as Border;
             if(mainBorder!=null)
@@ -44,8 +44,8 @@ namespace MultipleItemSelectorCustomControl
         {
             if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
             {
-                _backCount++;
-                if (_backCount == MaxNumBackKeyCount)
+                _backKeyCount++;
+                if (_backKeyCount == MaxNumBackKeyCount)
                 {
                     DeletePreviousItem();
                     keyEventArgs.Handled = true;
@@ -79,7 +79,7 @@ namespace MultipleItemSelectorCustomControl
         {
             if (ReferenceEquals(element, item))
                 return;
-
+            AddBorderEvents();
             var contentPresenter = element as ContentPresenter;
             ContentControl contentControl = null;
             if (contentPresenter == null)
@@ -114,13 +114,15 @@ namespace MultipleItemSelectorCustomControl
                 var container = element as MultipleItemSelectorItem;
                 if (container == null)
                     return;
-                if (ReferenceEquals(Items[Items.Count - 1], item))
-                        container.IsLastItem = true;
-                if (item.ToString() == "")
+                if (ReferenceEquals(Items[Items.Count - 1], item) && _itemsCount == Items.Count-1)
                 {
-                    container.IsEmptyItem = true;
+                    container.IsLastItem = true;
+                    _itemsCount = 0;
                 }
+                else
+                    _itemsCount++;
             }
+            
         }
         protected override void OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -191,8 +193,8 @@ namespace MultipleItemSelectorCustomControl
             
             if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
             {
-                _backCount++;
-                if (_backCount == MaxNumBackKeyCount)
+                _backKeyCount++;
+                if (_backKeyCount == MaxNumBackKeyCount)
                 {
                     DeletePreviousItem();
                     keyEventArgs.Handled = true;
@@ -236,7 +238,7 @@ namespace MultipleItemSelectorCustomControl
 
         private void DeletePreviousItem()
         {
-            _backCount = 0;
+            _backKeyCount = 0;
             var currentItemSource = new ObservableCollection<object>(ItemsSource.Cast<object>().ToList());
             if (currentItemSource.Any())
             {
