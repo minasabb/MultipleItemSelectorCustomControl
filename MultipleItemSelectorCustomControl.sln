@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleItemSelectorCustomControl", "TagBoxCustomControl\MultipleItemSelectorCustomControl.csproj", "{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleItemSelectorCustomControl", "MultipleItemSelectorCustomControl\MultipleItemSelectorCustomControl.csproj", "{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
