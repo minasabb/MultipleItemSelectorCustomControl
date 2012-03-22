@@ -19,10 +19,10 @@
         RadiusY="0.5"
         RadiusX="0.5">
         <GradientStop
-            Color="#FFDEE5F3"
+            Color="#FF7A7E88"
             Offset="0.992" />
         <GradientStop
-            Color="#FFC1CEE5" />
+            Color="#FF5E5E65" />
     </RadialGradientBrush>
 	
     <Style
@@ -64,6 +64,7 @@
                                             KeyboardNavigation.IsTabStop="False"
                                             Orientation="Horizontal">
                                             <ContentPresenter
+												TextBlock.Foreground="#FFE9E9E9"
                                                 KeyboardNavigation.IsTabStop="False"
                                                 x:Name="contentPresenter" 
 								                Margin="10,0" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
@@ -179,37 +180,37 @@
                                 Storyboard.TargetName="Line1">
                                 <EasingColorKeyFrame
                                     KeyTime="0"
-                                    Value="Gray" />
+                                    Value="#FFAFAFB0" />
                                 <EasingColorKeyFrame
                                     KeyTime="0:0:0.2"
-                                    Value="#FF5E5A5A" />
+                                    Value="#FFE9E9E9" />
                             </ColorAnimationUsingKeyFrames>
                             <ColorAnimationUsingKeyFrames
                                 Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)"
                                 Storyboard.TargetName="Line2">
                                 <EasingColorKeyFrame
                                     KeyTime="0"
-                                    Value="Gray" />
+                                    Value="#FFAFAFB0" />
                                 <EasingColorKeyFrame
                                     KeyTime="0:0:0.2"
-                                    Value="#FF5E5A5A" />
+                                    Value="#FFE9E9E9" />
                             </ColorAnimationUsingKeyFrames>
                         </Storyboard>
                         <Storyboard
                             x:Key="OnMouseLeave">
                             <ColorAnimationUsingKeyFrames
-                                Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)"
                                 Storyboard.TargetName="Line1">
                                 <EasingColorKeyFrame
                                     KeyTime="0:0:0.2"
-                                    Value="Gray" />
+                                    Value="#FFAFAFB0" />
                             </ColorAnimationUsingKeyFrames>
                             <ColorAnimationUsingKeyFrames
-                                Storyboard.TargetProperty="(Shape.Fill).(SolidColorBrush.Color)"
+                                Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)"
                                 Storyboard.TargetName="Line2">
                                 <EasingColorKeyFrame
                                     KeyTime="0:0:0.2"
-                                    Value="Gray" />
+                                    Value="#FFAFAFB0" />
                             </ColorAnimationUsingKeyFrames>
                         </Storyboard>
                     </ControlTemplate.Resources>
@@ -245,8 +246,8 @@
                 			x:Name="Line1"
                 			Data="M27,0 L0,23"
                 			Stretch="Fill"
-                			Stroke="Gray"
-                            Fill="Gray"
+                			Stroke="#FFAFAFB0"
+                            Fill="#FFAFAFB0"
                 			VerticalAlignment="Stretch"
                 			StrokeThickness="2" />
                 		<Path
@@ -254,8 +255,8 @@
                 			Data="M0,0 L27,23"
                 			Height="Auto"
                 			Stretch="Fill"
-                            Stroke="Gray"
-                            Fill="Gray"
+                            Stroke="#FFAFAFB0"
+                            Fill="#FFAFAFB0"
                 			VerticalAlignment="Stretch"
                 			StrokeThickness="2" />
                 	</Grid>

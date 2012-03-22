@@ -21,6 +21,7 @@
                 <TextBlock
                     x:Name="PART_AddItem"
                     Visibility="Collapsed"
+                    Foreground="#FF4277DC"
                     Text=" + Add Item" />
                 <ScrollViewer
                     Margin="0"
@@ -94,6 +95,7 @@
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
                         MinWidth="{TemplateBinding MinWidth}"
+                        Foreground="#FF4277DC"
                         Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}" />
                     <MultipleItemSelectorCustomControl:MultipleItemSelector
                         KeyboardNavigation.IsTabStop="False"
