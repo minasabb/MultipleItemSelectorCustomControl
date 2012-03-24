@@ -32,25 +32,9 @@ namespace MultipleItemSelectorCustomControl
         void AddBorderEvents()
         {
             var mainBorder = GetTemplateChild(PartItemsBorder) as Border;
-            if(mainBorder!=null)
-            {
-                mainBorder.MouseLeftButtonDown+=MainBorderMouseLeftButtonDown;
-                mainBorder.KeyUp += MainBorderOnKeyUp;
-            }
+            if (mainBorder != null)
+                mainBorder.MouseLeftButtonDown += MainBorderMouseLeftButtonDown;
             FindButtonControl(PartTagButton);
-        }
-
-        void MainBorderOnKeyUp(object sender, KeyEventArgs keyEventArgs)
-        {
-            if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
-            {
-                _backKeyCount++;
-                if (_backKeyCount == MaxNumBackKeyCount)
-                {
-                    DeletePreviousItem();
-                    keyEventArgs.Handled = true;
-                }
-            }
         }
 
         void MainBorderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -190,16 +174,18 @@ namespace MultipleItemSelectorCustomControl
         {
             if (keyEventArgs.Key == Key.Enter || keyEventArgs.Key == Key.Return || keyEventArgs.Key == Key.Tab)
                 CreateNewItem();
-            
+
             if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
             {
                 _backKeyCount++;
-                if (_backKeyCount == MaxNumBackKeyCount)
+                if (_backKeyCount >= MaxNumBackKeyCount)
                 {
                     DeletePreviousItem();
                     keyEventArgs.Handled = true;
                 }
             }
+            else if (keyEventArgs.Key == Key.Back && !string.IsNullOrEmpty(NewItem))
+                _backKeyCount = 0;
         }
 
         public T GetChild<T>(DependencyObject obj) where T : DependencyObject
@@ -234,6 +220,7 @@ namespace MultipleItemSelectorCustomControl
             if (currentItemSource == null || !currentItemSource.Any())
                 ItemsSource = new ObservableCollection<string> { NewItem };
             NewItem = string.Empty;
+            _backKeyCount = 0;
         }
 
         private void DeletePreviousItem()

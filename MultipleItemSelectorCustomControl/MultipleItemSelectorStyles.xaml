@@ -4,7 +4,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:MultipleItemSelectorCustomControl="clr-namespace:MultipleItemSelectorCustomControl"
-    xmlns:Microsoft_Windows_Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
     mc:Ignorable="d">
 
     <ResourceDictionary.MergedDictionaries>
@@ -13,7 +12,7 @@
     </ResourceDictionary.MergedDictionaries>
 	
 	<RadialGradientBrush
-        x:Key="ReverseMetroGradientBrush"
+        x:Key="ItemBorderGradientBrush"
         Center="0.5,0.5"
         GradientOrigin="0.5,0.5"
         RadiusY="0.5"
@@ -24,7 +23,8 @@
         <GradientStop
             Color="#FF5E5E65" />
     </RadialGradientBrush>
-	
+
+  
     <Style
         x:Key="MultipleItemSelectorStyle"
         TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}">
@@ -58,7 +58,7 @@
                                         x:Name="PART_TagBorder"
                                         BorderBrush="Gray"
 						                CornerRadius="3"
-						                Background="{StaticResource ReverseMetroGradientBrush}"
+						                Background="{StaticResource ItemBorderGradientBrush}"
                                         BorderThickness="1">
                                         <StackPanel
                                             KeyboardNavigation.IsTabStop="False"
@@ -67,7 +67,7 @@
 												TextBlock.Foreground="#FFE9E9E9"
                                                 KeyboardNavigation.IsTabStop="False"
                                                 x:Name="contentPresenter" 
-								                Margin="10,0" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+								                Margin="10,5" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                                             <Button
                                                 KeyboardNavigation.IsTabStop="False"
                                                 x:Name="PART_TagButton"
@@ -89,39 +89,9 @@
                 </Style>
             </Setter.Value>
         </Setter>
-        <!--<Setter
-            Property="ItemTemplate">
-            <Setter.Value>
-                <DataTemplate>
-                    <Border
-                        KeyboardNavigation.IsTabStop="False"
-                        Margin="0,3,3,0"
-                        Padding="5,0"
-                        x:Name="PART_TagBorder"
-                        BorderBrush="Gray"
-						CornerRadius="3"
-						Background="{StaticResource ReverseMetroGradientBrush}"
-                        BorderThickness="1">
-                        <StackPanel
-                            Orientation="Horizontal">
-                            <TextBlock
-							VerticalAlignment="Center"
-                                x:Name="PART_TagText"
-                                Text="{Binding}"
-								FontSize="12" 
-								Padding="10,0"/>
-                            <Button
-                                x:Name="PART_TagButton"
-                                Content="{Binding}"
-                                Style="{DynamicResource SelectorDeleteButtonStyle}" />
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </Setter.Value>
-        </Setter>-->
-
-
     </Style>
+    
+    
 	<Style x:Key="ButtonFocusVisual">
 		<Setter Property="Control.Template">
 			<Setter.Value>
@@ -131,12 +101,7 @@
 			</Setter.Value>
 		</Setter>
 	</Style>
-	<LinearGradientBrush x:Key="ButtonNormalBackground" EndPoint="0,1" StartPoint="0,0">
-		<GradientStop Color="#F3F3F3" Offset="0"/>
-		<GradientStop Color="#EBEBEB" Offset="0.5"/>
-		<GradientStop Color="#DDDDDD" Offset="0.5"/>
-		<GradientStop Color="#CDCDCD" Offset="1"/>
-	</LinearGradientBrush>
+
 	<SolidColorBrush x:Key="ButtonNormalBorder" Color="#FF707070"/>
 
 	<Style x:Key="SelectorDeleteButtonStyle" TargetType="{x:Type Button}">

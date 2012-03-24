@@ -6,14 +6,135 @@
     xmlns:MultipleItemSelectorCustomControl="clr-namespace:MultipleItemSelectorCustomControl"
     mc:Ignorable="d">
 
+    <Style
+        x:Key="SuggestionListBoxItemStyle"
+        TargetType="ListBoxItem">
+        <Setter
+            Property="Padding"
+            Value="3" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Left" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Top" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+        <Setter
+            Property="Template">
+            <Setter.Value>
+                <ControlTemplate
+                    TargetType="ListBoxItem">
+                    <Grid
+                        Background="{TemplateBinding Background}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup
+                                x:Name="CommonStates">
+                                <VisualState
+                                    x:Name="Normal" />
+                                <VisualState
+                                    x:Name="MouseOver">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="fillColor"
+                                            Storyboard.TargetProperty="Opacity"
+                                            Duration="0"
+                                            To=".35" />
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState
+                                    x:Name="Disabled">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="contentPresenter"
+                                            Storyboard.TargetProperty="Opacity"
+                                            Duration="0"
+                                            To=".55" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup
+                                x:Name="SelectionStates">
+                                <VisualState
+                                    x:Name="Unselected" />
+                                <VisualState
+                                    x:Name="Selected">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="fillColor2"
+                                            Storyboard.TargetProperty="Opacity"
+                                            Duration="0"
+                                            To=".75" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup
+                                x:Name="FocusStates">
+                                <VisualState
+                                    x:Name="Focused">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames
+                                            Storyboard.TargetName="FocusVisualElement"
+                                            Storyboard.TargetProperty="Visibility"
+                                            Duration="0">
+                                            <DiscreteObjectKeyFrame
+                                                KeyTime="0">
+                                                <DiscreteObjectKeyFrame.Value>
+                                                    <Visibility>Visible</Visibility>
+                                                </DiscreteObjectKeyFrame.Value>
+                                            </DiscreteObjectKeyFrame>
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState
+                                    x:Name="Unfocused" />
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <Rectangle
+                            x:Name="fillColor"
+                            Opacity="0"
+                            Fill="#FFBADDE9"
+                            IsHitTestVisible="False"
+                            RadiusX="1"
+                            RadiusY="1" />
+                        <Rectangle
+                            x:Name="fillColor2"
+                            Opacity="0"
+                            Fill="#FFBADDE9"
+                            IsHitTestVisible="False"
+                            RadiusX="1"
+                            RadiusY="1" />
+                        <ContentPresenter
+                            x:Name="contentPresenter"
+                            Content="{TemplateBinding Content}"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            Margin="{TemplateBinding Padding}" />
+                        <Rectangle
+                            x:Name="FocusVisualElement"
+                            Stroke="#FF6DBDD1"
+                            StrokeThickness="1"
+                            Visibility="Collapsed"
+                            RadiusX="1"
+                            RadiusY="1" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
+    <!-- Textbox template -->
     <ControlTemplate
         x:Key="NewItemFocusedTemplate"
         TargetType="{x:Type TextBoxBase}">
         <Border
-            Name="TextBox_Border"
+            Name="TextBox_Border"                                                
             CornerRadius="2"
-            Padding="2"
+            Padding="5"
             BorderThickness="1"
             BorderBrush="Transparent"
             Background="Transparent">
@@ -54,7 +175,8 @@
             </MultiTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-    
+
+    <!-- MultipleItemSelector template -->
     <ControlTemplate
         x:Key="MultipleItemSelectorTemplate"
         TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}">
@@ -62,7 +184,7 @@
                 KeyboardNavigation.IsTabStop="False"
                 Width="{TemplateBinding Width}"
                 Height="{TemplateBinding Height}"
-                Padding="5"
+                Padding="2"
                 BorderThickness="0"
                 Background="White"
                 x:Name="PART_itemsBorder">
@@ -71,7 +193,7 @@
             </Border>
     </ControlTemplate>
 
-
+    <!-- MultipleItemSelectorAutoComplete template -->
     <ControlTemplate
         x:Key="MultipleItemSelectorAutoCompleteTemplate"
         TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}">
@@ -95,7 +217,6 @@
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
                         MinWidth="{TemplateBinding MinWidth}"
-                        Foreground="#FF4277DC"
                         Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}" />
                     <MultipleItemSelectorCustomControl:MultipleItemSelector
                         KeyboardNavigation.IsTabStop="False"
@@ -124,6 +245,7 @@
                 KeyboardNavigation.DirectionalNavigation="Contained"
                 x:Name="PART_SuggestionList"
                 MinWidth="100"
+                    ItemContainerStyle="{StaticResource SuggestionListBoxItemStyle}"
                 ItemsSource="{TemplateBinding SuggestionList}"
                 SelectedItem="{Binding SelectedSuggestionItem,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}" />
             </Popup>

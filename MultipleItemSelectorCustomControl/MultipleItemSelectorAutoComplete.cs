@@ -137,6 +137,7 @@ namespace MultipleItemSelectorCustomControl
             {
                 control.NewItem = newvalue;
                 control.NewItemCompleted = true;
+                control.NewItem = string.Empty;
             }
         }
 
