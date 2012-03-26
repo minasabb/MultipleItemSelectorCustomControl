@@ -52,12 +52,13 @@
                             <ControlTemplate TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}" >
                                 <StackPanel Orientation="Horizontal">
                                     <Border
-                                        KeyboardNavigation.IsTabStop="False"
+                                        Focusable="True"
                                         Margin="0,3,3,0"
                                         Padding="5,0"
                                         x:Name="PART_TagBorder"
                                         BorderBrush="Gray"
 						                CornerRadius="3"
+                                        FocusVisualStyle="{x:Null}"
 						                Background="{StaticResource ItemBorderGradientBrush}"
                                         BorderThickness="1">
                                         <StackPanel
@@ -81,8 +82,13 @@
                                         x:Name="PART_NewItem"
                                         Template="{StaticResource NewItemFocusedTemplate}"
                                         Text="{Binding NewItem, RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}}, UpdateSourceTrigger=PropertyChanged}"
-                                        MinWidth="50"/>
+                                        />
                                 </StackPanel>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsFocused" SourceName="PART_TagBorder" Value="True">
+                                        <Setter Property="BorderBrush" TargetName="PART_TagBorder" Value="Black" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>

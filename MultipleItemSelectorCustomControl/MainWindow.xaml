@@ -6,8 +6,7 @@
         <Control:MultipleItemSelectorAutoComplete
             VerticalAlignment="Top"
             Items="{Binding Tags,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-            SuggestionList="{Binding Suggestions}"
-            Height="100">
+            SuggestionList="{Binding Suggestions}">
         </Control:MultipleItemSelectorAutoComplete>
         <Button Click="button1_Click" Content="Button" Height="23" HorizontalAlignment="Left" Margin="12,118,0,0" Name="button1" VerticalAlignment="Top" Width="75" />
     </Grid>

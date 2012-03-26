@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Collections;
 
 namespace MultipleItemSelectorCustomControl
 {
@@ -13,19 +14,24 @@ namespace MultipleItemSelectorCustomControl
         private const string PartTagButton = "PART_TagButton";
         private const string PartNewItem = "PART_NewItem";
         private const string PartItemsBorder = "PART_itemsBorder";
-        private const int MaxNumBackKeyCount = 2;
-        private int _backKeyCount;
+        
         private int _itemsCount;
 
         public MultipleItemSelector()
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorStyle");
+            MouseLeftButtonDown += MultipleItemSelectorMouseLeftButtonDown;
             GotFocus += MultipleItemSelectorGotFocus;
+        }
+
+        void MultipleItemSelectorMouseLeftButtonDown(object sender, RoutedEventArgs e)
+        {
+            FindTextBoxControl(PartNewItem);
+            FindButtonControl(PartTagButton);
         }
 
         void MultipleItemSelectorGotFocus(object sender, RoutedEventArgs e)
         {
-            FindTextBoxControl(PartNewItem);
             FindButtonControl(PartTagButton);
         }
 
@@ -33,8 +39,22 @@ namespace MultipleItemSelectorCustomControl
         {
             var mainBorder = GetTemplateChild(PartItemsBorder) as Border;
             if (mainBorder != null)
+            {
                 mainBorder.MouseLeftButtonDown += MainBorderMouseLeftButtonDown;
+                mainBorder.PreviewKeyUp += MainBorderOnPreviewKeyUp;
+            }
             FindButtonControl(PartTagButton);
+        }
+
+        void MainBorderOnPreviewKeyUp(object sender, KeyEventArgs keyEventArgs)
+        {
+            if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
+            {
+                var container = ItemContainerGenerator.ContainerFromIndex(Items.Count - 1);
+                var textbox = GetChild<TextBox>(container);
+                if(textbox!=null && textbox.Visibility==Visibility.Visible && !textbox.IsFocused)
+                    DeletePreviousItem();
+            }
         }
 
         void MainBorderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -165,27 +185,8 @@ namespace MultipleItemSelectorCustomControl
             var textbox = GetChild<TextBox>(container);
             if (textbox == null || textbox.Name != name) return;
             textbox.Visibility = Visibility.Visible;
-            textbox.PreviewKeyUp += TextboxOnPreviewKeyUp;
-            if(!textbox.IsFocused)
-            textbox.Focus();
-        }
-
-        void TextboxOnPreviewKeyUp(object sender, KeyEventArgs keyEventArgs)
-        {
-            if (keyEventArgs.Key == Key.Enter || keyEventArgs.Key == Key.Return || keyEventArgs.Key == Key.Tab)
-                CreateNewItem();
-
-            if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
-            {
-                _backKeyCount++;
-                if (_backKeyCount >= MaxNumBackKeyCount)
-                {
-                    DeletePreviousItem();
-                    keyEventArgs.Handled = true;
-                }
-            }
-            else if (keyEventArgs.Key == Key.Back && !string.IsNullOrEmpty(NewItem))
-                _backKeyCount = 0;
+            if (!textbox.IsFocused)
+                textbox.Focus();
         }
 
         public T GetChild<T>(DependencyObject obj) where T : DependencyObject
@@ -220,12 +221,12 @@ namespace MultipleItemSelectorCustomControl
             if (currentItemSource == null || !currentItemSource.Any())
                 ItemsSource = new ObservableCollection<string> { NewItem };
             NewItem = string.Empty;
-            _backKeyCount = 0;
+            
         }
 
         private void DeletePreviousItem()
         {
-            _backKeyCount = 0;
+            //_backKeyCount = 0;
             var currentItemSource = new ObservableCollection<object>(ItemsSource.Cast<object>().ToList());
             if (currentItemSource.Any())
             {
@@ -282,5 +283,6 @@ namespace MultipleItemSelectorCustomControl
             get { return (bool)GetValue(NewItemCompletedProperty); }
             set { SetValue(NewItemCompletedProperty, value); }
         }
+
     }
 }

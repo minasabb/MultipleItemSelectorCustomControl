@@ -21,25 +21,30 @@ namespace MultipleItemSelectorCustomControl
         public MultipleItemSelectorAutoComplete()
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorAutoCompleteStyle");
-            PreviewKeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
-        }
-
-        void NewItemTextboxPreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Tab || e.Key == Key.Enter || e.Key == Key.Return)
-                NewItemCompleted = true;
+            KeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
         }
 
         void MultipleItemSelectorAutoCompleteKeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Tab) return;
             var suggestionlist = GetTemplateChild(PartSuggestionList) as ListBox;
             if (suggestionlist == null)
                 return;
-            if (suggestionlist.Items.Count > 0)
+            if (e.Key == Key.Tab || e.Key == Key.Enter || e.Key == Key.Return)
             {
-                suggestionlist.SelectedIndex = 0;
-                IsSuggestionOpen = false;
+                if (suggestionlist.Items.Count > 0)
+                {
+                    NewItem = SelectedSuggestionItem;
+                    NewItemCompleted = true;
+                    NewItem = string.Empty;
+                    IsSuggestionOpen = false;
+                }
+            }
+            if (e.Key == Key.Up || e.Key == Key.Down)
+            {
+                if (e.Key == Key.Up && suggestionlist.SelectedIndex > 0)
+                    suggestionlist.SelectedIndex = suggestionlist.SelectedIndex - 1;
+                if (e.Key == Key.Down && suggestionlist.SelectedIndex < suggestionlist.Items.Count)
+                    suggestionlist.SelectedIndex = suggestionlist.SelectedIndex + 1;
             }
             e.Handled = true;
         }
@@ -61,11 +66,6 @@ namespace MultipleItemSelectorCustomControl
             control.IsSuggestionOpen = !string.IsNullOrEmpty(newValue);
 
             if (!control.IsSuggestionOpen) return;
-
-            var newItemTextbox = control.GetTemplateChild(PartNewItem) as TextBox;
-            if (newItemTextbox != null)
-                newItemTextbox.PreviewKeyUp += control.NewItemTextboxPreviewKeyUp;
-
             //Update Filter
             var suggestionlist = control.GetTemplateChild(PartSuggestionList) as ListBox;
             if (suggestionlist == null)
@@ -86,6 +86,8 @@ namespace MultipleItemSelectorCustomControl
             //If no items hide the suggestion
             if (suggestionlist.Items.Count == 0)
                 IsSuggestionOpen = false;
+            else
+                suggestionlist.SelectedIndex = 0;
         }
 
         public string NewItem
@@ -132,13 +134,16 @@ namespace MultipleItemSelectorCustomControl
             var control = d as MultipleItemSelectorAutoComplete;
             if (control == null)
                 return;
-            var newvalue = e.NewValue as string;
-            if (!string.IsNullOrEmpty(newvalue))
+            var suggestionlist = control.GetTemplateChild(PartSuggestionList) as ListBox;
+            if (suggestionlist == null || suggestionlist.SelectedItem==null)
+                    return;
+            if (suggestionlist.IsMouseCaptureWithin && control.SelectedSuggestionItem!=null)
             {
-                control.NewItem = newvalue;
+                control.NewItem = control.SelectedSuggestionItem;
                 control.NewItemCompleted = true;
                 control.NewItem = string.Empty;
             }
+            
         }
 
         public string SelectedSuggestionItem
