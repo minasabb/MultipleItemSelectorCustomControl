@@ -1,0 +1,116 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:MultipleItemSelectorCustomControl="clr-namespace:MultipleItemSelectorCustomControl"
+    xmlns:TagBoxCustomControl="clr-namespace:TagBoxCustomControl" mc:Ignorable="d">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary
+            Source="MultipleItemSelectorTemplates.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style
+        x:Key="MultipleItemSelectorStyle"
+        TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}">
+        <Setter
+            Property="Template"
+            Value="{StaticResource MultipleItemSelectorTemplate}" />
+        <Setter
+            Property="KeyboardNavigation.IsTabStop"
+            Value="False" />
+        <Setter
+            Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel
+                        Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter
+            Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style
+                    TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}">
+                    <Setter
+                        Property="Template"
+                        Value="{StaticResource MultipleItemSelectorItemTemplate}"/>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+    <Style
+        x:Key="ButtonFocusVisual">
+        <Setter
+            Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle
+                        Margin="2"
+                        SnapsToDevicePixels="true"
+                        Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"
+                        StrokeThickness="1"
+                        StrokeDashArray="1 2" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush
+        x:Key="ButtonNormalBorder"
+        Color="#FF707070" />
+
+    <Style
+        x:Key="SelectorDeleteButtonStyle"
+        TargetType="{x:Type Button}">
+        <Setter
+            Property="FocusVisualStyle"
+            Value="{StaticResource ButtonFocusVisual}" />
+        <Setter
+            Property="Background"
+            Value="Transparent" />
+        <Setter
+            Property="BorderBrush"
+            Value="{StaticResource ButtonNormalBorder}" />
+        <Setter
+            Property="BorderThickness"
+            Value="1" />
+        <Setter
+            Property="Margin"
+            Value="0,5,5,5" />
+        <Setter
+            Property="Foreground"
+            Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        <Setter
+            Property="HorizontalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="VerticalContentAlignment"
+            Value="Center" />
+        <Setter
+            Property="Padding"
+            Value="1" />
+        <Setter
+            Property="Template"
+            Value="{StaticResource DeleteButtonTemplate}">
+        </Setter>
+    </Style>
+
+
+    <Style
+        x:Key="MultipleItemSelectorAutoCompleteStyle"
+        TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}">
+        <Setter
+            Property="KeyboardNavigation.IsTabStop"
+            Value="False" />
+        <Setter
+            Property="Template"
+            Value="{StaticResource MultipleItemSelectorAutoCompleteTemplate}" />
+
+    </Style>
+
+</ResourceDictionary>

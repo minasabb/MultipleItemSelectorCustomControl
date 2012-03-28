@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using TagBoxCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
-    [TemplatePart(Name = PartNewItem, Type = typeof(TextBox))]
+    [TemplatePart(Name = PartNewItemText, Type = typeof(TextBox))]
     [TemplatePart(Name = PartSuggestionList, Type = typeof(ListBox))]
     public class MultipleItemSelectorAutoComplete: Control
     {
         private const string PartSuggestionList = "PART_SuggestionList";
-        private const string PartNewItem = "PART_NewItem";
+        private const string PartNewItemText = "PART_NewItemText";
+        IEnumerator<ItemViewModel> _matchingItemEnumerator;
 
         static MultipleItemSelectorAutoComplete()
         {
@@ -22,6 +27,20 @@ namespace MultipleItemSelectorCustomControl
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorAutoCompleteStyle");
             KeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
+            
+        }
+
+        static void SuggestionlistPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var listbox = sender as ListBox;
+            if(listbox==null)
+                return;
+            var control = listbox.TemplatedParent as MultipleItemSelectorAutoComplete;
+            if (control == null || string.IsNullOrEmpty( control.NewItemText))
+                return;
+            control.NewItemTextCompleted = true;
+            control.NewItemText = string.Empty;
+            control.IsSuggestionOpen = false;
         }
 
         void MultipleItemSelectorAutoCompleteKeyUp(object sender, KeyEventArgs e)
@@ -31,11 +50,10 @@ namespace MultipleItemSelectorCustomControl
                 return;
             if (e.Key == Key.Tab || e.Key == Key.Enter || e.Key == Key.Return)
             {
-                if (suggestionlist.Items.Count > 0)
+                if (suggestionlist.Items.Count > 0 && !string.IsNullOrEmpty(NewItemText))
                 {
-                    NewItem = SelectedSuggestionItem;
-                    NewItemCompleted = true;
-                    NewItem = string.Empty;
+                    NewItemTextCompleted = true;
+                    NewItemText = string.Empty;
                     IsSuggestionOpen = false;
                 }
             }
@@ -49,19 +67,21 @@ namespace MultipleItemSelectorCustomControl
             e.Handled = true;
         }
 
-        public static readonly DependencyProperty NewItemProperty =
+        public static readonly DependencyProperty NewItemTextProperty =
             DependencyProperty.Register(
-                "NewItem",
+                "NewItemText",
                 typeof(string),
                 typeof(MultipleItemSelectorAutoComplete),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnNewItemChanged));
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnNewItemTextChanged));
 
-        static void OnNewItemChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        static void OnNewItemTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = d as MultipleItemSelectorAutoComplete;
             if (control == null)
                 return;
-            control.NewItemCompleted = false;
+
+            control.IsSuggestionOpen = false;
+            control.NewItemTextCompleted = false;
             var newValue = (string)e.NewValue;
             control.IsSuggestionOpen = !string.IsNullOrEmpty(newValue);
 
@@ -70,19 +90,27 @@ namespace MultipleItemSelectorCustomControl
             var suggestionlist = control.GetTemplateChild(PartSuggestionList) as ListBox;
             if (suggestionlist == null)
                 return;
+            suggestionlist.PreviewMouseLeftButtonUp += SuggestionlistPreviewMouseLeftButtonUp;
             control.UpdateSuggestionList(suggestionlist,newValue);
 
         }
 
         void UpdateSuggestionList(ListBox suggestionlist,string filter)
         {
-            suggestionlist.Items.Filter = p =>
+            //suggestionlist.Items.Filter = p =>
+            //{
+            //    var path = p as ItemViewModel;
+            //    return filter != null && (path != null && (path.Name.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase) &&
+            //                                                 !(String.Equals(path.Name, filter, StringComparison.CurrentCultureIgnoreCase))));
+            //};
+            var newFilteredList = new ObservableCollection<ItemViewModel>();
+            if (_matchingItemEnumerator == null || !_matchingItemEnumerator.MoveNext())
+                VerifyMatchingPeopleEnumerator(filter,SuggestionList.Cast<ItemViewModel>().FirstOrDefault());
+            while (_matchingItemEnumerator != null && _matchingItemEnumerator.MoveNext())
             {
-                var path = p as string;
-                return filter != null && (path != null && (path.StartsWith(filter, StringComparison.CurrentCultureIgnoreCase) &&
-                                                             !(String.Equals(path, filter, StringComparison.CurrentCultureIgnoreCase))));
-            };
-
+                newFilteredList.Add(_matchingItemEnumerator.Current);
+            }
+            suggestionlist.ItemsSource = newFilteredList;
             //If no items hide the suggestion
             if (suggestionlist.Items.Count == 0)
                 IsSuggestionOpen = false;
@@ -90,10 +118,42 @@ namespace MultipleItemSelectorCustomControl
                 suggestionlist.SelectedIndex = 0;
         }
 
-        public string NewItem
+        void VerifyMatchingPeopleEnumerator(string searchText,ItemViewModel item)
         {
-            get { return (string)GetValue(NewItemProperty); }
-            set { SetValue(NewItemProperty, value); }
+            var matches = FindMatches(searchText, item);
+            _matchingItemEnumerator = matches.GetEnumerator();
+        }
+
+        IEnumerable<ItemViewModel> FindMatches(string searchText, ItemViewModel item)
+        {
+            //if ((item.Name.StartsWith(searchText, StringComparison.CurrentCultureIgnoreCase) && 
+            //    !(String.Equals(item.Name, searchText, StringComparison.CurrentCultureIgnoreCase))))
+            //    yield return item;
+
+            if (item.NameContainsText(searchText))
+                yield return item;
+
+            foreach (ItemViewModel match in item.Children.SelectMany(child => FindMatches(searchText, child)))
+                yield return match;
+        }
+
+        public string NewItemText
+        {
+            get { return (string)GetValue(NewItemTextProperty); }
+            set { SetValue(NewItemTextProperty, value); }
+        }
+
+        public static readonly DependencyProperty AddItemTextProperty =
+            DependencyProperty.Register(
+                "AddItemText",
+                typeof(string),
+                typeof(MultipleItemSelectorAutoComplete),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public string AddItemText
+        {
+            get { return (string)GetValue(AddItemTextProperty); }
+            set { SetValue(AddItemTextProperty, value); }
         }
 
         public static readonly DependencyProperty ItemsProperty =
@@ -114,7 +174,13 @@ namespace MultipleItemSelectorCustomControl
                 "SuggestionList",
                 typeof(IEnumerable),
                 typeof(MultipleItemSelectorAutoComplete),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,OnSuggestionListChanged));
+
+        static void OnSuggestionListChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as MultipleItemSelectorAutoComplete;
+            if (control != null) control.FilteredSuggestionList = (IEnumerable) e.NewValue;
+        }
 
         public IEnumerable SuggestionList
         {
@@ -122,33 +188,29 @@ namespace MultipleItemSelectorCustomControl
             set { SetValue(SuggestionListProperty, value); }
         }
 
+        public static readonly DependencyProperty FilteredSuggestionListProperty =
+            DependencyProperty.Register(
+                "FilteredSuggestionList",
+                typeof(IEnumerable),
+                typeof(MultipleItemSelectorAutoComplete),
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public IEnumerable FilteredSuggestionList
+        {
+            get { return (IEnumerable)GetValue(FilteredSuggestionListProperty); }
+            set { SetValue(FilteredSuggestionListProperty, value); }
+        }
+
         public static readonly DependencyProperty SelectedSuggestionItemProperty =
             DependencyProperty.Register(
                 "SelectedSuggestionItem",
-                typeof(string),
+                typeof(ItemViewModel),
                 typeof(MultipleItemSelectorAutoComplete),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnSuggestionSelected));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        static void OnSuggestionSelected(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public ItemViewModel SelectedSuggestionItem
         {
-            var control = d as MultipleItemSelectorAutoComplete;
-            if (control == null)
-                return;
-            var suggestionlist = control.GetTemplateChild(PartSuggestionList) as ListBox;
-            if (suggestionlist == null || suggestionlist.SelectedItem==null)
-                    return;
-            if (suggestionlist.IsMouseCaptureWithin && control.SelectedSuggestionItem!=null)
-            {
-                control.NewItem = control.SelectedSuggestionItem;
-                control.NewItemCompleted = true;
-                control.NewItem = string.Empty;
-            }
-            
-        }
-
-        public string SelectedSuggestionItem
-        {
-            get { return (string)GetValue(SelectedSuggestionItemProperty); }
+            get { return (ItemViewModel)GetValue(SelectedSuggestionItemProperty); }
             set { SetValue(SelectedSuggestionItemProperty, value); }
         }
 
@@ -165,17 +227,17 @@ namespace MultipleItemSelectorCustomControl
             set { SetValue(IsSuggestionOpenProperty, value); }
         }
 
-        public static readonly DependencyProperty NewItemCompletedProperty =
+        public static readonly DependencyProperty NewItemTextCompletedProperty =
             DependencyProperty.Register(
-                "NewItemCompleted",
+                "NewItemTextCompleted",
                 typeof(bool),
                 typeof(MultipleItemSelectorAutoComplete),
                 new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public bool NewItemCompleted
+        public bool NewItemTextCompleted
         {
-            get { return (bool)GetValue(NewItemCompletedProperty); }
-            set { SetValue(NewItemCompletedProperty, value); }
+            get { return (bool)GetValue(NewItemTextCompletedProperty); }
+            set { SetValue(NewItemTextCompletedProperty, value); }
         }
     }
 }

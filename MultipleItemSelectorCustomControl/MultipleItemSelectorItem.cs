@@ -4,11 +4,11 @@ using System.Windows.Input;
 
 namespace MultipleItemSelectorCustomControl
 {
-    [TemplatePart(Name = PartNewItem, Type = typeof(TextBox))]
+    [TemplatePart(Name = PartNewItemText, Type = typeof(TextBox))]
     [TemplatePart(Name = PartTagBorder, Type = typeof(Border))]
     public class MultipleItemSelectorItem: ContentControl
     {
-        private const string PartNewItem = "PART_NewItem";
+        private const string PartNewItemText = "PART_NewItemText";
         private const string PartTagBorder = "PART_TagBorder";
         private const int MaxNumBackKeyCount = 2;
         private int _backKeyCount;
@@ -22,9 +22,9 @@ namespace MultipleItemSelectorCustomControl
                 if (_isLastItem != value)
                 {
                     _isLastItem = value;
-                    var newItem = GetTemplateChild(PartNewItem) as FrameworkElement;
-                    if (newItem != null)
-                        newItem.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
+                    var NewItemText = GetTemplateChild(PartNewItemText) as FrameworkElement;
+                    if (NewItemText != null)
+                        NewItemText.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
                     
                 }
             }
@@ -37,11 +37,11 @@ namespace MultipleItemSelectorCustomControl
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            var newItem = GetTemplateChild(PartNewItem) as TextBox;
-            if (newItem == null) return;
-            newItem.KeyUp += TextboxOnPreviewKeyUp;
-            newItem.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
-            newItem.Focus();
+            var NewItemText = GetTemplateChild(PartNewItemText) as TextBox;
+            if (NewItemText == null) return;
+            NewItemText.KeyUp += TextboxOnPreviewKeyUp;
+            NewItemText.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
+            NewItemText.Focus();
         }
 
         void TextboxOnPreviewKeyUp(object sender, KeyEventArgs keyEventArgs)

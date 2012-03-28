@@ -73,16 +73,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DisplayMemberPathConverter.cs" />
     <Compile Include="InverseNoItemsToVisibilityConverter.cs" />
+    <Compile Include="Model\Item.cs" />
     <Compile Include="NoItemsToVisibilityConverter.cs" />
     <Compile Include="MultipleItemSelectorAutoComplete.cs" />
     <Compile Include="MultipleItemSelector.cs" />
     <Compile Include="MultipleItemSelectorItem.cs" />
-    <Page Include="MultipleItemSelectorStyles.xaml">
+    <Compile Include="ViewModel\ItemViewModel.cs" />
+    <Page Include="Resources\MultipleItemSelectorStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="MultipleItemSelectorTemplates.xaml">
+    <Page Include="Resources\MultipleItemSelectorTemplates.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Collections;
+using TagBoxCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
@@ -12,7 +13,7 @@ namespace MultipleItemSelectorCustomControl
     public class MultipleItemSelector:ItemsControl
     {
         private const string PartTagButton = "PART_TagButton";
-        private const string PartNewItem = "PART_NewItem";
+        private const string PartNewItemText = "PART_NewItemText";
         private const string PartItemsBorder = "PART_itemsBorder";
         
         private int _itemsCount;
@@ -26,7 +27,7 @@ namespace MultipleItemSelectorCustomControl
 
         void MultipleItemSelectorMouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            FindTextBoxControl(PartNewItem);
+            FindTextBoxControl(PartNewItemText);
             FindButtonControl(PartTagButton);
         }
 
@@ -48,7 +49,7 @@ namespace MultipleItemSelectorCustomControl
 
         void MainBorderOnPreviewKeyUp(object sender, KeyEventArgs keyEventArgs)
         {
-            if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItem))
+            if (keyEventArgs.Key == Key.Back && string.IsNullOrEmpty(NewItemText))
             {
                 var container = ItemContainerGenerator.ContainerFromIndex(Items.Count - 1);
                 var textbox = GetChild<TextBox>(container);
@@ -59,7 +60,7 @@ namespace MultipleItemSelectorCustomControl
 
         void MainBorderMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            FindTextBoxControl(PartNewItem);
+            FindTextBoxControl(PartNewItemText);
         }
 
         public new Style ItemContainerStyle
@@ -167,10 +168,16 @@ namespace MultipleItemSelectorCustomControl
                 var container = ItemContainerGenerator.ContainerFromIndex(i);
                 var currentButton = GetChild<Button>(container);
 
-                if (currentButton != null && currentButton.Name == PartTagButton && currentButton.Content == button.Content)
+                if (currentButton != null && currentButton.Content is ItemViewModel && button.Content is ItemViewModel)
                 {
-                    itemIndex = i;
-                    break;
+                    var currentItem = currentButton.Content as ItemViewModel;
+                    var selectedItem = button.Content as ItemViewModel;
+                    if (selectedItem.Id == currentItem.Id)
+                    {
+                        itemIndex = i;
+                        break;
+                    }
+                    
                 }
             }
             if(itemIndex!=-1)
@@ -209,65 +216,73 @@ namespace MultipleItemSelectorCustomControl
 
         private void CreateNewItem()
         {
-            if (string.IsNullOrEmpty(NewItem)) return;
-            ObservableCollection<object> currentItemSource=null;
+            if (NewItem==null) return;
+            ObservableCollection<ItemViewModel> currentItemSource=null;
             if(ItemsSource!=null)
-                currentItemSource = new ObservableCollection<object>(ItemsSource.Cast<object>().ToList());
+                currentItemSource = new ObservableCollection<ItemViewModel>(ItemsSource.Cast<ItemViewModel>().ToList());
             if (currentItemSource!=null && currentItemSource.Any())
             {
                 currentItemSource.Add(NewItem);
                 ItemsSource = currentItemSource;
             }
             if (currentItemSource == null || !currentItemSource.Any())
-                ItemsSource = new ObservableCollection<string> { NewItem };
-            NewItem = string.Empty;
+                ItemsSource = new ObservableCollection<ItemViewModel> { NewItem };
+            NewItemText = string.Empty;
             
         }
 
         private void DeletePreviousItem()
         {
             //_backKeyCount = 0;
-            var currentItemSource = new ObservableCollection<object>(ItemsSource.Cast<object>().ToList());
-            if (currentItemSource.Any())
-            {
-                currentItemSource.RemoveAt(currentItemSource.Count-1);
-                ItemsSource = currentItemSource;
-                NewItem = string.Empty;
-            }
+            if (Items != null && Items.Count > 0)
+                DeleteItemByIndex(Items.Count - 1);
         }
 
         private void DeleteItemByIndex(int index)
         {
-            var currentItemSource = new ObservableCollection<object>(ItemsSource.Cast<object>().ToList());
-            if (currentItemSource.Any() && index< currentItemSource.Count)
+            var currentItemSource = new ObservableCollection<ItemViewModel>(ItemsSource.Cast<ItemViewModel>().ToList());
+            if (currentItemSource.Any() && index < currentItemSource.Count)
             {
                 currentItemSource.RemoveAt(index);
                 ItemsSource = currentItemSource;
-                NewItem = string.Empty;
+                NewItemText = string.Empty;
             }
+        }
+
+        public static readonly DependencyProperty NewItemTextProperty =
+            DependencyProperty.Register(
+                "NewItemText",
+                typeof(string),
+                typeof(MultipleItemSelector),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public string NewItemText
+        {
+            get { return (string)GetValue(NewItemTextProperty); }
+            set { SetValue(NewItemTextProperty, value); }
         }
 
         public static readonly DependencyProperty NewItemProperty =
             DependencyProperty.Register(
                 "NewItem",
-                typeof(string),
+                typeof(ItemViewModel),
                 typeof(MultipleItemSelector),
-                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        public string NewItem
+        public ItemViewModel NewItem
         {
-            get { return (string)GetValue(NewItemProperty); }
+            get { return (ItemViewModel)GetValue(NewItemProperty); }
             set { SetValue(NewItemProperty, value); }
         }
 
-        public static readonly DependencyProperty NewItemCompletedProperty =
+        public static readonly DependencyProperty NewItemTextCompletedProperty =
             DependencyProperty.Register(
-                "NewItemCompleted",
+                "NewItemTextCompleted",
                 typeof(bool),
                 typeof(MultipleItemSelector),
-                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,OnNewItemCompletedChanged));
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault,OnNewItemTextCompletedChanged));
 
-        static void OnNewItemCompletedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        static void OnNewItemTextCompletedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var completed = (bool)e.NewValue;
             var control = d as MultipleItemSelector;
@@ -275,13 +290,13 @@ namespace MultipleItemSelectorCustomControl
                 return;
             if(completed)
                 control.CreateNewItem();
-            control.NewItemCompleted = false;
+            control.NewItemTextCompleted = false;
         }
 
-        public bool NewItemCompleted
+        public bool NewItemTextCompleted
         {
-            get { return (bool)GetValue(NewItemCompletedProperty); }
-            set { SetValue(NewItemCompletedProperty, value); }
+            get { return (bool)GetValue(NewItemTextCompletedProperty); }
+            set { SetValue(NewItemTextCompletedProperty, value); }
         }
 
     }

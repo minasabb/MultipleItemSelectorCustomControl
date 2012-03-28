@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using TagBoxCustomControl;
+using TagBoxCustomControl.Model;
+using TagBoxCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
@@ -24,17 +15,131 @@ namespace MultipleItemSelectorCustomControl
         {
             InitializeComponent();
             DataContext = this;
+            LoadItems();
             //Tags = new ObservableCollection<string> { "Test1", "Test2", "Test3", "Test4", "Test5" };
-            Suggestions = new ObservableCollection<string> { "Test", "Test Test", "my", "new group", "some text","Mina","Hello" };
         }
 
-        public ObservableCollection<string> Tags { get; set; }
-        public ObservableCollection<string> Suggestions { get; set; }
+        public ObservableCollection<ItemViewModel> Tags { get; set; }
+        public ObservableCollection<ItemViewModel> Suggestions { get; set; }
         public string Suggestion { get; set; }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void  LoadItems()
+        {
+            // In a real app this method would access a database.
+            var items= new Item
+            {
+                Name = "CEO",
+                Id = 1,
+                Children =
+                {
+                    new Item
+                    {
+                        Name="Software Support",
+                        Id = 2,
+                    },
+                    new Item
+                    {
+                        Name="Director HR/Finance",
+                        Id = 3,
+                        Children=
+                        {
+                            new Item
+                            {
+                                Name="Reconcillar",
+                                Id = 4,
+                            },
+                            new Item
+                            {
+                                Name="HR Manager",
+                                Id = 5,
+                            }
+                        }
+                    },
+                    new Item
+                    {
+                        Name="Director Of Sales",
+                        Id = 6,
+                        Children=
+                        {
+                            new Item
+                            {
+                                Name="Regional Manager NE",
+                                Id = 7,
+                            },
+                            new Item
+                            {
+                                Name="Regional Manager MidWest",
+                                Id = 8,
+                                Children=
+                                {
+                                    new Item
+                                    {
+                                        Name="Store Manager",
+                                        Id = 9,
+                                        Children =
+                                            {
+                                                new Item
+                                                {
+                                                    Name="Sales Representative"
+                                                },
+                                                new Item
+                                                {
+                                                    Name="Store Clerk"
+                                                }
+                                            }
+                                    },
+                                }
+                            },
+                            new Item
+                            {
+                                Name="Regional Manager SE",
+                                Id = 10,
+                            },
+                        }
+                    },
+                    new Item
+                      {
+                          Name = "Director Of Operations",
+                          Id = 11,
+                          Children = 
+                          {
+                              new Item
+                                     {
+                                         Name = "Inventory Manager",
+                                         Id = 12,
+                                         Children =
+                                             {
+                                                 new Item
+                                                 {
+                                                     Name = "Service Manager",
+                                                     Id = 13,
+                                                     Children=
+                                                         {
+                                                             new Item
+                                                             {
+                                                                 Name = "Service Tech",
+                                                                 Id = 14,
+                                                             }
+                                                         }
+                                                 }
+                                             }
+                                     }
+                          }
+                      }
+
+                }
+            };
+            var rootItem = new ItemViewModel(items);
+            Suggestions = new ObservableCollection<ItemViewModel>(
+                new[] 
+                { 
+                    rootItem 
+                });
         }
     }
 }
