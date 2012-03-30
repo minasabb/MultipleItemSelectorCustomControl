@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows.Data;
-using TagBoxCustomControl.ViewModel;
+using MultipleItemSelectorCustomControl.ViewModel;
 
-namespace TagBoxCustomControl
+namespace MultipleItemSelectorCustomControl
 {
     public class DisplayMemberPathConverter : IValueConverter
     {

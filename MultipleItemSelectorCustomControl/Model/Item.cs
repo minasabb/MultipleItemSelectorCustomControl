@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace TagBoxCustomControl.Model
+namespace MultipleItemSelectorCustomControl.Model
 {
     public class Item
     {

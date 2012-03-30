@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:MultipleItemSelectorCustomControl="clr-namespace:MultipleItemSelectorCustomControl"
-    xmlns:TagBoxCustomControl="clr-namespace:TagBoxCustomControl" mc:Ignorable="d">
+    mc:Ignorable="d">
 
     <Style
         x:Key="SuggestionListBoxItemStyle"
@@ -108,11 +108,10 @@
                             IsHitTestVisible="False"
                             RadiusX="1"
                             RadiusY="1" />
-                        <!--Content="{TemplateBinding Content,Converter={x:Static TagBoxCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"
+                        <!--Content="{TemplateBinding Content,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"
                             ContentTemplate="{TemplateBinding ContentTemplate}"-->
                         <ContentPresenter
                             x:Name="contentPresenter"
-                            
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                             Margin="{TemplateBinding Padding}" />
                         <Rectangle
@@ -190,7 +189,49 @@
         <GradientStop
             Color="#FF5E5E65" />
     </RadialGradientBrush>
-    
+
+    <LinearGradientBrush
+        x:Key="SelectedItemBorderGradientBrush"
+        EndPoint="0.5,0"
+        StartPoint="0.5,1">
+        <GradientStop
+            Color="#FF2B2A2E"
+            Offset="0" />
+        <GradientStop
+            Color="#FF33353B"
+            Offset="0.30000299215316772" />
+        <GradientStop
+            Color="#FF3F4248"
+            Offset="0.80000299215316772" />
+        <GradientStop
+            Color="#FF484B52"
+            Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush
+        x:Key="ChildrenListBoxGradientBrush"
+        EndPoint="0.5,0"
+        StartPoint="0.5,1">
+    	<LinearGradientBrush.RelativeTransform>
+    		<TransformGroup>
+    			<ScaleTransform CenterY="0.5" CenterX="0.5"/>
+    			<SkewTransform CenterY="0.5" CenterX="0.5"/>
+    			<RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
+    			<TranslateTransform/>
+    		</TransformGroup>
+    	</LinearGradientBrush.RelativeTransform>
+        <GradientStop
+            Color="#FF2D2E33" />
+        <GradientStop
+            Color="#FF37383E"
+            Offset="0.3" />
+        <GradientStop
+            Color="#FF484C52"
+            Offset="0.8" />
+        <GradientStop
+            Color="#FF4C4E55" Offset="1" />
+    </LinearGradientBrush>
+
     <ControlTemplate
         x:Key="DeleteButtonTemplate"
         TargetType="{x:Type Button}">
@@ -205,7 +246,7 @@
                         Value="#FFAFAFB0" />
                     <EasingColorKeyFrame
                         KeyTime="0:0:0.2"
-                        Value="#FFE9E9E9" />
+                        Value="#FFF1F1F1" />
                 </ColorAnimationUsingKeyFrames>
                 <ColorAnimationUsingKeyFrames
                     Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)"
@@ -215,7 +256,7 @@
                         Value="#FFAFAFB0" />
                     <EasingColorKeyFrame
                         KeyTime="0:0:0.2"
-                        Value="#FFE9E9E9" />
+                        Value="#FFF1F1F1" />
                 </ColorAnimationUsingKeyFrames>
             </Storyboard>
             <Storyboard
@@ -331,34 +372,82 @@
         TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}">
         <StackPanel
             Orientation="Horizontal">
-            <Border
-                Focusable="True"
-                Margin="0,3,3,0"
-                Padding="5,0"
-                x:Name="PART_TagBorder"
-                BorderBrush="LightGray"
-                CornerRadius="3"
-                FocusVisualStyle="{x:Null}"
-                Background="{StaticResource ItemBorderGradientBrush}"
-                BorderThickness="1">
-                <StackPanel
-                    KeyboardNavigation.IsTabStop="False"
-                    Orientation="Horizontal">
-                    <ContentPresenter
-                        TextBlock.Foreground="#FFE9E9E9"
+            <StackPanel
+                x:Name="PART_ItemStackPanel">
+                <Border
+                    Focusable="True"
+                    Margin="0,3,3,0"
+                    Padding="5,0"
+                    x:Name="PART_TagBorder"
+                    BorderBrush="LightGray"
+                    CornerRadius="3"
+                    FocusVisualStyle="{x:Null}"
+                    Background="{StaticResource ItemBorderGradientBrush}"
+                    BorderThickness="1">
+                    <StackPanel
                         KeyboardNavigation.IsTabStop="False"
-                        x:Name="contentPresenter"
-                        Margin="10,5"
-                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                        Content="{TemplateBinding Content,Converter={x:Static TagBoxCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"
-                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
-                    <Button
-                        KeyboardNavigation.IsTabStop="False"
-                        x:Name="PART_TagButton"
-                        Content="{TemplateBinding Content}"
-                        Style="{DynamicResource SelectorDeleteButtonStyle}" />
-                </StackPanel>
-            </Border>
+                        Orientation="Horizontal">
+                        <Border
+                            x:Name="childrenCountBorder"
+                            BorderThickness="0"
+                            CornerRadius="16"
+                            Background="#FFF1F1F1"
+                            Grid.Column="1"
+                            Width="20"
+                            Height="20"
+                            Visibility="{Binding ItemsSource,ElementName=PART_ChildrenList, Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">
+                            <TextBlock
+                                Margin="0"
+                                TextWrapping="Wrap"
+                                Text="{Binding SelectedItems.Count,ElementName=PART_ChildrenList}"
+                                Foreground="#FF5E5E65"
+                                FontSize="13.333"
+                                FontWeight="Bold"
+                                FontFamily="Museo Sans 700"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center" />
+                        </Border>
+                        <!--,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"-->
+                        <ContentPresenter
+                            TextBlock.Foreground="#FFF1F1F1"
+                            KeyboardNavigation.IsTabStop="False"
+                            x:Name="contentPresenter"
+                            Margin="10,5"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Content="{TemplateBinding Content,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                        <Button
+                            KeyboardNavigation.IsTabStop="False"
+                            x:Name="PART_TagButton"
+                            Content="{TemplateBinding Content}"
+                            Style="{DynamicResource SelectorDeleteButtonStyle}" />
+                    </StackPanel>
+                </Border>
+                <Popup
+                    x:Name="PART_ChildrenPopup"
+                    IsOpen="False">
+                    <ListBox
+                        Background="{StaticResource ChildrenListBoxGradientBrush}"
+                        x:Name="PART_ChildrenList"
+                        SelectionMode="Multiple"
+                        Visibility="{Binding ItemsSource,RelativeSource={RelativeSource Self}, Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}"
+                        ItemsSource="{TemplateBinding Content,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Children}"
+                        Style="{DynamicResource ChildrenListBoxStyle}"
+                        ItemContainerStyle="{DynamicResource ChildrenListBoxItemStyle}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Content="{Binding Name}"
+                                    Margin="3,3,10,3"
+                                    IsChecked="{Binding RelativeSource=
+                                   {RelativeSource Mode=FindAncestor,
+                                    AncestorType={x:Type ListBoxItem}},
+                                   Path=IsSelected}" Style="{DynamicResource ChildCheckBoxStyle}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Popup>
+            </StackPanel>
             <TextBox
                 KeyboardNavigation.IsTabStop="False"
                 VerticalAlignment="Center"
@@ -375,7 +464,34 @@
                     Property="BorderBrush"
                     TargetName="PART_TagBorder"
                     Value="Black" />
+                <Setter
+                    Property="Background"
+                    TargetName="PART_TagBorder"
+                    Value="{StaticResource SelectedItemBorderGradientBrush}" />
             </Trigger>
+            <Trigger
+                Property="IsMouseOver"
+                SourceName="PART_ItemStackPanel"
+                Value="True">
+                <Setter
+                    Property="BorderBrush"
+                    TargetName="PART_TagBorder"
+                    Value="Black" />
+                <Setter
+                    Property="Background"
+                    TargetName="PART_TagBorder"
+                    Value="{StaticResource SelectedItemBorderGradientBrush}" />
+            </Trigger>
+            <Trigger
+                Property="IsMouseCaptureWithin"
+                SourceName="PART_ItemStackPanel"
+                Value="False">
+                <Setter
+                    Property="IsOpen"
+                    TargetName="PART_ChildrenPopup"
+                    Value="false" />
+            </Trigger>
+
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -395,12 +511,13 @@
                 KeyboardNavigation.IsTabStop="False" />
         </Border>
     </ControlTemplate>
-    
-    
-    
+
+
+
 
     <!-- MultipleItemSelectorAutoComplete templates -->
-    <DataTemplate x:Key="ItemChildrenTemplate">
+    <DataTemplate
+        x:Key="ItemChildrenTemplate">
         <StackPanel
             Orientation="Horizontal">
             <TextBlock
@@ -424,8 +541,9 @@
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
-    
-    <DataTemplate x:Key="SuggestionListItemTemplate">
+
+    <DataTemplate
+        x:Key="SuggestionListItemTemplate">
         <StackPanel
             MinHeight="30">
             <TextBlock
@@ -469,21 +587,21 @@
                         Height="{TemplateBinding Height}"
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
-                        MinWidth="{TemplateBinding MinWidth}"
-                        Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}" />
+                        MinWidth="{TemplateBinding MinWidth}" />
+                    <!--Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}"-->
                     <MultipleItemSelectorCustomControl:MultipleItemSelector
                         KeyboardNavigation.IsTabStop="False"
                         x:Name="PART_MultipleSelector"
                         VerticalAlignment="Top"
-                        ItemsSource="{Binding Items,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
+                        ItemsSource="{Binding Items,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
                         NewItem="{Binding SelectedSuggestionItem,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
                         NewItemText="{Binding NewItemText,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
                         NewItemTextCompleted="{Binding NewItemTextCompleted,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
                         Height="{TemplateBinding Height}"
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
-                        MinWidth="{TemplateBinding MinWidth}"
-                        Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">
+                        MinWidth="{TemplateBinding MinWidth}">
+                        <!--Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">-->
                     </MultipleItemSelectorCustomControl:MultipleItemSelector>
                 </Grid>
             </Border>

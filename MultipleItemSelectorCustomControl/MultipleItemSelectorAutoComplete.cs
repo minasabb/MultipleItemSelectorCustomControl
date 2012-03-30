@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using TagBoxCustomControl.ViewModel;
+using MultipleItemSelectorCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
@@ -108,7 +107,8 @@ namespace MultipleItemSelectorCustomControl
                 VerifyMatchingPeopleEnumerator(filter,SuggestionList.Cast<ItemViewModel>().FirstOrDefault());
             while (_matchingItemEnumerator != null && _matchingItemEnumerator.MoveNext())
             {
-                newFilteredList.Add(_matchingItemEnumerator.Current);
+                if (Items==null || Items.Cast<ItemViewModel>().All(item => item.Id != _matchingItemEnumerator.Current.Id))
+                    newFilteredList.Add(_matchingItemEnumerator.Current);
             }
             suggestionlist.ItemsSource = newFilteredList;
             //If no items hide the suggestion

@@ -8,8 +8,8 @@
     <ProjectGuid>{5A2E3385-4D86-49BF-B641-4EA96D2C2DC7}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TagBoxCustomControl</RootNamespace>
-    <AssemblyName>TagBoxCustomControl</AssemblyName>
+    <RootNamespace>MultipleItemSelectorCustomControl</RootNamespace>
+    <AssemblyName>MultipleItemSelectorCustomControl</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -81,6 +81,11 @@
     <Compile Include="MultipleItemSelector.cs" />
     <Compile Include="MultipleItemSelectorItem.cs" />
     <Compile Include="ViewModel\ItemViewModel.cs" />
+    <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <ContainsDesignTimeResources>true</ContainsDesignTimeResources>
+    </Page>
     <Page Include="Resources\MultipleItemSelectorStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

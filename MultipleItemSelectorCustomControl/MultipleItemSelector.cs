@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Collections;
-using TagBoxCustomControl.ViewModel;
+using MultipleItemSelectorCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
@@ -15,7 +15,8 @@ namespace MultipleItemSelectorCustomControl
         private const string PartTagButton = "PART_TagButton";
         private const string PartNewItemText = "PART_NewItemText";
         private const string PartItemsBorder = "PART_itemsBorder";
-        
+        private const string PartChildrenPopup = "PART_ChildrenPopup";
+
         private int _itemsCount;
 
         public MultipleItemSelector()

@@ -2,19 +2,19 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using TagBoxCustomControl.Model;
+using MultipleItemSelectorCustomControl.Model;
 
-namespace TagBoxCustomControl.ViewModel
+namespace MultipleItemSelectorCustomControl.ViewModel
 {
     public class ItemViewModel : INotifyPropertyChanged
     {
 
-        readonly ReadOnlyCollection<ItemViewModel> _children;
+        readonly ObservableCollection<ItemViewModel> _children;
         readonly ItemViewModel _parent;
         readonly Item _item;
 
         //bool _isExpanded;
-        //bool _isSelected;
+        bool _isSelected;
 
         public ItemViewModel(Item item)
             : this(item, null)
@@ -23,19 +23,20 @@ namespace TagBoxCustomControl.ViewModel
 
         private ItemViewModel(Item item, ItemViewModel parent)
         {
+            IsSelected = true;
             if (item != null)
             {
                 _item = item;
                 _parent = parent;
 
-                _children = new ReadOnlyCollection<ItemViewModel>(
+                _children = new ObservableCollection<ItemViewModel>(
                     (from child in _item.Children
                      select new ItemViewModel(child, this))
                         .ToList<ItemViewModel>());
             }
         }
 
-        public ReadOnlyCollection<ItemViewModel> Children
+        public ObservableCollection<ItemViewModel> Children
         {
             get { return _children; }
         }
@@ -67,26 +68,23 @@ namespace TagBoxCustomControl.ViewModel
         //    }
         //}
 
-        //public bool IsSelected
-        //{
-        //    get { return _isSelected; }
-        //    set
-        //    {
-        //        if (value != _isSelected)
-        //        {
-        //            _isSelected = value;
-        //            OnPropertyChanged("IsSelected");
-        //        }
-        //    }
-        //}
-
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set
+            {
+                
+                _isSelected = value;
+                OnPropertyChanged("IsSelected");
+            }
+        }
 
         public bool NameContainsText(string text)
         {
-            if (String.IsNullOrEmpty(text) || String.IsNullOrEmpty(this.Name))
+            if (String.IsNullOrEmpty(text) || String.IsNullOrEmpty(Name))
                 return false;
 
-            return this.Name.IndexOf(text, StringComparison.InvariantCultureIgnoreCase) > -1;
+            return Name.IndexOf(text, StringComparison.InvariantCultureIgnoreCase) > -1;
         }
 
         public ItemViewModel Parent

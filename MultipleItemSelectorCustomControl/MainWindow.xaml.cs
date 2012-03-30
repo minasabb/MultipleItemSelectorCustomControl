@@ -1,8 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows;
-using TagBoxCustomControl;
-using TagBoxCustomControl.Model;
-using TagBoxCustomControl.ViewModel;
+using MultipleItemSelectorCustomControl.Model;
+using MultipleItemSelectorCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
