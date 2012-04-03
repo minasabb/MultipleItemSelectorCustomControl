@@ -6,6 +6,9 @@
     xmlns:MultipleItemSelectorCustomControl="clr-namespace:MultipleItemSelectorCustomControl"
     mc:Ignorable="d">
 
+    <MultipleItemSelectorCustomControl:DisplayMemberPathConverter
+        x:Key="MultipleItemSelectorCustomControl:DisplayMemberPathConverter" />
+
     <Style
         x:Key="SuggestionListBoxItemStyle"
         TargetType="ListBoxItem">
@@ -140,9 +143,11 @@
             Background="Transparent">
             <Grid>
                 <TextBlock
+                    HorizontalAlignment="Left"
                     x:Name="PART_AddItem"
                     Visibility="Collapsed"
                     Foreground="#FF4277DC"
+                    Cursor="Hand"
                     Text="{Binding AddItemText,RelativeSource={RelativeSource FindAncestor,AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}" />
                 <ScrollViewer
                     Margin="0"
@@ -212,14 +217,21 @@
         x:Key="ChildrenListBoxGradientBrush"
         EndPoint="0.5,0"
         StartPoint="0.5,1">
-    	<LinearGradientBrush.RelativeTransform>
-    		<TransformGroup>
-    			<ScaleTransform CenterY="0.5" CenterX="0.5"/>
-    			<SkewTransform CenterY="0.5" CenterX="0.5"/>
-    			<RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
-    			<TranslateTransform/>
-    		</TransformGroup>
-    	</LinearGradientBrush.RelativeTransform>
+        <LinearGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform
+                    CenterY="0.5"
+                    CenterX="0.5" />
+                <SkewTransform
+                    CenterY="0.5"
+                    CenterX="0.5" />
+                <RotateTransform
+                    Angle="-90"
+                    CenterY="0.5"
+                    CenterX="0.5" />
+                <TranslateTransform />
+            </TransformGroup>
+        </LinearGradientBrush.RelativeTransform>
         <GradientStop
             Color="#FF2D2E33" />
         <GradientStop
@@ -229,7 +241,8 @@
             Color="#FF484C52"
             Offset="0.8" />
         <GradientStop
-            Color="#FF4C4E55" Offset="1" />
+            Color="#FF4C4E55"
+            Offset="1" />
     </LinearGradientBrush>
 
     <ControlTemplate
@@ -397,15 +410,17 @@
                             Height="20"
                             Visibility="{Binding ItemsSource,ElementName=PART_ChildrenList, Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">
                             <TextBlock
-                                Margin="0"
+                                x:Name="PART_ExpanderText"
+                                Margin="0,0,0,3"
                                 TextWrapping="Wrap"
-                                Text="{Binding SelectedItems.Count,ElementName=PART_ChildrenList}"
+                                Text="+"
                                 Foreground="#FF5E5E65"
                                 FontSize="13.333"
                                 FontWeight="Bold"
                                 FontFamily="Museo Sans 700"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center" />
+                            <!--Text="{Binding SelectedItems.Count,ElementName=PART_ChildrenList}"-->
                         </Border>
                         <!--,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"-->
                         <ContentPresenter
@@ -413,9 +428,19 @@
                             KeyboardNavigation.IsTabStop="False"
                             x:Name="contentPresenter"
                             Margin="10,5"
-                            ContentTemplate="{TemplateBinding ContentTemplate}"
-                            Content="{TemplateBinding Content,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Name}"
-                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <ContentPresenter.Content>
+                                <MultiBinding
+                                    Converter="{StaticResource MultipleItemSelectorCustomControl:DisplayMemberPathConverter}">
+                                    <Binding
+                                        Path="Content"
+                                        RelativeSource="{RelativeSource FindAncestor,AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}}" />
+                                    <Binding
+                                        Path="DisplayMemberPath"
+                                        RelativeSource="{RelativeSource FindAncestor,AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}}" />
+                                </MultiBinding>
+                            </ContentPresenter.Content>
+                        </ContentPresenter>
                         <Button
                             KeyboardNavigation.IsTabStop="False"
                             x:Name="PART_TagButton"
@@ -431,9 +456,22 @@
                         x:Name="PART_ChildrenList"
                         SelectionMode="Multiple"
                         Visibility="{Binding ItemsSource,RelativeSource={RelativeSource Self}, Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}"
-                        ItemsSource="{TemplateBinding Content,Converter={x:Static MultipleItemSelectorCustomControl:DisplayMemberPathConverter.Instance},ConverterParameter=Children}"
                         Style="{DynamicResource ChildrenListBoxStyle}"
                         ItemContainerStyle="{DynamicResource ChildrenListBoxItemStyle}">
+                        <ListBox.ItemsSource>
+                            <MultiBinding
+                                Converter="{StaticResource MultipleItemSelectorCustomControl:DisplayMemberPathConverter}"
+                                ConverterParameter="Children">
+                                <Binding
+                                    Path="Content"
+                                    RelativeSource="{RelativeSource FindAncestor,AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}}" />
+                            </MultiBinding>
+                        </ListBox.ItemsSource>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <CheckBox
@@ -442,7 +480,8 @@
                                     IsChecked="{Binding RelativeSource=
                                    {RelativeSource Mode=FindAncestor,
                                     AncestorType={x:Type ListBoxItem}},
-                                   Path=IsSelected}" Style="{DynamicResource ChildCheckBoxStyle}" />
+                                   Path=IsSelected}"
+                                    Style="{DynamicResource ChildCheckBoxStyle}" />
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
@@ -587,8 +626,8 @@
                         Height="{TemplateBinding Height}"
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
-                        MinWidth="{TemplateBinding MinWidth}" />
-                    <!--Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}"-->
+                        MinWidth="{TemplateBinding MinWidth}" 
+                        Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:NoItemsToVisibilityConverter.Instance}}"/>
                     <MultipleItemSelectorCustomControl:MultipleItemSelector
                         KeyboardNavigation.IsTabStop="False"
                         x:Name="PART_MultipleSelector"
@@ -600,14 +639,21 @@
                         Height="{TemplateBinding Height}"
                         MinHeight="{TemplateBinding MinHeight}"
                         Width="{TemplateBinding Width}"
-                        MinWidth="{TemplateBinding MinWidth}">
-                        <!--Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">-->
+                        MinWidth="{TemplateBinding MinWidth}"
+                        DisplayMemberPath="{Binding DisplayMemberPath,Mode=TwoWay,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}}"
+                        Visibility="{Binding ItemsSource, ElementName=PART_MultipleSelector,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged,Converter={x:Static MultipleItemSelectorCustomControl:InverseNoItemsToVisibilityConverter.Instance}}">
                     </MultipleItemSelectorCustomControl:MultipleItemSelector>
                 </Grid>
             </Border>
+            <!--<TextBlock
+                
+                Text="{Binding IsOpen,ElementName=PART_Popup}" />
+            <TextBlock
+                Foreground="Red"
+                Text="{Binding  IsSuggestionOpen,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}} }" />-->
             <Popup
-                StaysOpen="False"
-                IsOpen="{TemplateBinding IsSuggestionOpen}"
+                StaysOpen="true"
+                IsOpen="{Binding  IsSuggestionOpen,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}} }"
                 x:Name="PART_Popup"
                 AllowsTransparency="true"
                 Placement="Bottom">
@@ -625,8 +671,41 @@
                     ItemTemplate="{StaticResource SuggestionListItemTemplate}">
                 </ListBox>
             </Popup>
+
         </StackPanel>
+        <ControlTemplate.Triggers>
+            <!--<MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition
+                        Property="IsFocused"
+                        Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter
+                    TargetName="PART_Popup"
+                    Property="IsOpen"
+                    Value="True" />
+                <Setter
+                    TargetName="PART_Popup"
+                    Property="StaysOpen"
+                    Value="True" />
+            </MultiTrigger>-->
+            <!--MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition
+                        Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"
+                        Value="True" />
+                    <Condition
+                        Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
+                        Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter
+                    TargetName="ExpanderImage"
+                    Property="Source"
+                    Value="..\Images\Icons\32x32\Green\Close.png" />
+            </MultiDataTrigger>  -->
+        </ControlTemplate.Triggers>
     </ControlTemplate>
+
 
 
 

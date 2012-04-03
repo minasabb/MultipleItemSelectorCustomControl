@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using MultipleItemSelectorCustomControl.ViewModel;
 
@@ -11,10 +13,12 @@ namespace MultipleItemSelectorCustomControl
 {
     [TemplatePart(Name = PartNewItemText, Type = typeof(TextBox))]
     [TemplatePart(Name = PartSuggestionList, Type = typeof(ListBox))]
+    [TemplatePart(Name = PartPopup, Type = typeof(Popup))]
     public class MultipleItemSelectorAutoComplete: Control
     {
         private const string PartSuggestionList = "PART_SuggestionList";
         private const string PartNewItemText = "PART_NewItemText";
+        private const string PartPopup = "PART_Popup";
         IEnumerator<ItemViewModel> _matchingItemEnumerator;
 
         static MultipleItemSelectorAutoComplete()
@@ -26,8 +30,28 @@ namespace MultipleItemSelectorCustomControl
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorAutoCompleteStyle");
             KeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
-            
+            //GotFocus += new RoutedEventHandler(MultipleItemSelectorAutoComplete_PreviewGotKeyboardFocus);
         }
+
+        //void MultipleItemSelectorAutoComplete_PreviewGotKeyboardFocus(object sender, RoutedEventArgs routedEventArgs)
+        //{
+        //    Debug.WriteLine("Before - isOpenSuggestion gotfocus " + IsSuggestionOpen);
+        //    IsSuggestionOpen = true;
+        //    Debug.WriteLine("After - isOpenSuggestion gotfocus " + IsSuggestionOpen);
+
+        //    if (string.IsNullOrEmpty(NewItemText))
+        //    {
+        //        var suggestionlist = GetTemplateChild(PartSuggestionList) as ListBox;
+        //        if (suggestionlist == null)
+        //            return;
+        //        IsSuggestionOpen = true;
+        //        suggestionlist.Focus();
+        //        if (suggestionlist.Items.Count == 1)
+        //            UpdateSuggestionList("");
+        //        suggestionlist.Focus();
+        //    }
+        //}
+
 
         static void SuggestionlistPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -35,11 +59,9 @@ namespace MultipleItemSelectorCustomControl
             if(listbox==null)
                 return;
             var control = listbox.TemplatedParent as MultipleItemSelectorAutoComplete;
-            if (control == null || string.IsNullOrEmpty( control.NewItemText))
+            if (control == null)
                 return;
-            control.NewItemTextCompleted = true;
-            control.NewItemText = string.Empty;
-            control.IsSuggestionOpen = false;
+            control.AddNewItem(listbox);
         }
 
         void MultipleItemSelectorAutoCompleteKeyUp(object sender, KeyEventArgs e)
@@ -49,21 +71,35 @@ namespace MultipleItemSelectorCustomControl
                 return;
             if (e.Key == Key.Tab || e.Key == Key.Enter || e.Key == Key.Return)
             {
-                if (suggestionlist.Items.Count > 0 && !string.IsNullOrEmpty(NewItemText))
-                {
-                    NewItemTextCompleted = true;
-                    NewItemText = string.Empty;
-                    IsSuggestionOpen = false;
-                }
+                AddNewItem(suggestionlist);
             }
             if (e.Key == Key.Up || e.Key == Key.Down)
             {
+                if(string.IsNullOrEmpty(NewItemText))
+                {
+                    IsSuggestionOpen = true;
+                    if (suggestionlist.Items.Count==1)
+                        UpdateSuggestionList("");
+                }
                 if (e.Key == Key.Up && suggestionlist.SelectedIndex > 0)
                     suggestionlist.SelectedIndex = suggestionlist.SelectedIndex - 1;
                 if (e.Key == Key.Down && suggestionlist.SelectedIndex < suggestionlist.Items.Count)
                     suggestionlist.SelectedIndex = suggestionlist.SelectedIndex + 1;
             }
             e.Handled = true;
+        }
+
+        void AddNewItem(ListBox suggestionlist)
+        {
+            if (suggestionlist.Items.Count > 0 && suggestionlist.SelectedIndex != -1) //&& !string.IsNullOrEmpty(NewItemText))
+            {
+                IsSuggestionOpen = false;
+                NewItemTextCompleted = true;
+                NewItemText = string.Empty;
+                suggestionlist.SelectedIndex = -1;
+                
+                NewItemTextCompleted = false;
+            }
         }
 
         public static readonly DependencyProperty NewItemTextProperty =
@@ -82,18 +118,21 @@ namespace MultipleItemSelectorCustomControl
             control.IsSuggestionOpen = false;
             control.NewItemTextCompleted = false;
             var newValue = (string)e.NewValue;
-            control.IsSuggestionOpen = !string.IsNullOrEmpty(newValue);
+            control.IsSuggestionOpen = true;//!string.IsNullOrEmpty(newValue);
 
-            if (!control.IsSuggestionOpen) return;
+            //if (!control.IsSuggestionOpen) return;
             //Update Filter
-            var suggestionlist = control.GetTemplateChild(PartSuggestionList) as ListBox;
+            control.UpdateSuggestionList(newValue);
+        }
+
+        private void UpdateSuggestionList(string filter)
+        {
+            var suggestionlist = GetTemplateChild(PartSuggestionList) as ListBox;
             if (suggestionlist == null)
                 return;
             suggestionlist.PreviewMouseLeftButtonUp += SuggestionlistPreviewMouseLeftButtonUp;
-            control.UpdateSuggestionList(suggestionlist,newValue);
-
+            UpdateSuggestionList(suggestionlist, filter);
         }
-
         void UpdateSuggestionList(ListBox suggestionlist,string filter)
         {
             //suggestionlist.Items.Filter = p =>
@@ -111,6 +150,7 @@ namespace MultipleItemSelectorCustomControl
                     newFilteredList.Add(_matchingItemEnumerator.Current);
             }
             suggestionlist.ItemsSource = newFilteredList;
+
             //If no items hide the suggestion
             if (suggestionlist.Items.Count == 0)
                 IsSuggestionOpen = false;
@@ -130,7 +170,7 @@ namespace MultipleItemSelectorCustomControl
             //    !(String.Equals(item.Name, searchText, StringComparison.CurrentCultureIgnoreCase))))
             //    yield return item;
 
-            if (item.NameContainsText(searchText))
+            if (item.NameContainsText(searchText) || string.IsNullOrEmpty(searchText))
                 yield return item;
 
             foreach (ItemViewModel match in item.Children.SelectMany(child => FindMatches(searchText, child)))
@@ -224,7 +264,12 @@ namespace MultipleItemSelectorCustomControl
         public bool IsSuggestionOpen
         {
             get { return (bool)GetValue(IsSuggestionOpenProperty); }
-            set { SetValue(IsSuggestionOpenProperty, value); }
+            set
+            {
+                
+                SetValue(IsSuggestionOpenProperty, value);
+                Debug.WriteLine("After - isOpenSuggestion property " + value);
+            }
         }
 
         public static readonly DependencyProperty NewItemTextCompletedProperty =
@@ -238,6 +283,19 @@ namespace MultipleItemSelectorCustomControl
         {
             get { return (bool)GetValue(NewItemTextCompletedProperty); }
             set { SetValue(NewItemTextCompletedProperty, value); }
+        }
+
+        public static readonly DependencyProperty DisplayMemberPathProperty =
+            DependencyProperty.Register(
+                "DisplayMemberPath",
+                typeof(string),
+                typeof(MultipleItemSelectorAutoComplete),
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public string DisplayMemberPath
+        {
+            get { return (string)GetValue(DisplayMemberPathProperty); }
+            set { SetValue(DisplayMemberPathProperty, value); }
         }
     }
 }

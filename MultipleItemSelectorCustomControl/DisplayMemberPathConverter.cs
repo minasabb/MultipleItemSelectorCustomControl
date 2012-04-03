@@ -5,22 +5,28 @@ using MultipleItemSelectorCustomControl.ViewModel;
 
 namespace MultipleItemSelectorCustomControl
 {
-    public class DisplayMemberPathConverter : IValueConverter
+    public class DisplayMemberPathConverter : IMultiValueConverter
     {
         public static DisplayMemberPathConverter Instance { get { return _instance; } }
         private static readonly DisplayMemberPathConverter _instance = new DisplayMemberPathConverter();
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var item = value as ItemViewModel;
-            var displayPath = parameter.ToString();
+            if (values == null || values.Length < 1)
+                return null;
+            var item = values[0] as ItemViewModel;
+            var displayPath = string.Empty;
+            if (values.Length > 1) 
+                displayPath=values[1].ToString();
+            else if (parameter!=null)
+                displayPath = parameter.ToString();
+
             if (item !=null && !string.IsNullOrEmpty(displayPath))
                 return item.GetType().GetProperty(displayPath).GetValue(item, null);
-            if (item != null) return item.ToString();
-            return null;
+            return item != null ? item.ToString() : null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

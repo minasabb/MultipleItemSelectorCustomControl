@@ -5,11 +5,13 @@
     <Grid>
         <Control:MultipleItemSelectorAutoComplete
             VerticalAlignment="Top"
-            AddItemText="+ Add Role"
+            AddItemText="+ Add"
+            DisplayMemberPath="Name"
+            MinHeight="100"
             Items="{Binding Tags,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
             SuggestionList="{Binding Suggestions}">
         </Control:MultipleItemSelectorAutoComplete>
-        <!--<Button Click="button1_Click" Content="Button"
-              Height="23" HorizontalAlignment="Left" Margin="12,118,0,0" Name="button1" VerticalAlignment="Top" Width="75" />-->
+        <Button Click="button1_Click" Content="Button"
+              Height="23" HorizontalAlignment="Left" Margin="12,118,0,0" Name="button1" VerticalAlignment="Top" Width="75" />
     </Grid>
 </Window>

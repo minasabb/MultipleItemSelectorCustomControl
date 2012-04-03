@@ -10,6 +10,7 @@ namespace MultipleItemSelectorCustomControl
     [TemplatePart(Name = PartChildrenPopup, Type = typeof(Popup))]
     [TemplatePart(Name = PartItemStackPanel, Type = typeof(StackPanel))]
     [TemplatePart(Name = PartChildrenList, Type = typeof(ListBox))]
+    [TemplatePart(Name = PartExpanderText, Type = typeof(TextBlock))]
     public class MultipleItemSelectorItem: ContentControl
     {
         private const string PartNewItemText = "PART_NewItemText";
@@ -17,6 +18,7 @@ namespace MultipleItemSelectorCustomControl
         private const string PartChildrenPopup = "PART_ChildrenPopup";
         private const string PartItemStackPanel = "PART_ItemStackPanel";
         private const string PartChildrenList = "PART_ChildrenList";
+        private const string PartExpanderText = "PART_ExpanderText";
         private const int MaxNumBackKeyCount = 2;
         private int _backKeyCount;
 
@@ -54,6 +56,9 @@ namespace MultipleItemSelectorCustomControl
 
         void OnLeaveMouse(object sender, RoutedEventArgs e)
         {
+            var expanderText = GetTemplateChild(PartExpanderText) as TextBlock;
+            if (expanderText == null) return;
+            expanderText.Text = "+";
             CloseChildrenPopup();
         }
 
@@ -68,6 +73,9 @@ namespace MultipleItemSelectorCustomControl
             }
             popup.IsOpen = true;
             popup.StaysOpen = true;
+            var expanderText = GetTemplateChild(PartExpanderText) as TextBlock;
+            if (expanderText == null) return;
+            expanderText.Text =  "-";
         }
 
         void TextboxOnPreviewKeyUp(object sender, KeyEventArgs keyEventArgs)
