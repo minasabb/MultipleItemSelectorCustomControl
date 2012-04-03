@@ -645,14 +645,9 @@
                     </MultipleItemSelectorCustomControl:MultipleItemSelector>
                 </Grid>
             </Border>
-            <!--<TextBlock
-                
-                Text="{Binding IsOpen,ElementName=PART_Popup}" />
-            <TextBlock
-                Foreground="Red"
-                Text="{Binding  IsSuggestionOpen,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}} }" />-->
+
             <Popup
-                StaysOpen="true"
+                StaysOpen="False"
                 IsOpen="{Binding  IsSuggestionOpen,RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}} }"
                 x:Name="PART_Popup"
                 AllowsTransparency="true"

@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Control="clr-namespace:MultipleItemSelectorCustomControl"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
+    <StackPanel>
         <Control:MultipleItemSelectorAutoComplete
             VerticalAlignment="Top"
             AddItemText="+ Add"
@@ -12,6 +12,6 @@
             SuggestionList="{Binding Suggestions}">
         </Control:MultipleItemSelectorAutoComplete>
         <Button Click="button1_Click" Content="Button"
-              Height="23" HorizontalAlignment="Left" Margin="12,118,0,0" Name="button1" VerticalAlignment="Top" Width="75" />
-    </Grid>
+              Height="23" HorizontalAlignment="Left"  Name="button1" VerticalAlignment="Top" Width="75" />
+    </StackPanel>
 </Window>

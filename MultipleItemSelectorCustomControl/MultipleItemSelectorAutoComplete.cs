@@ -94,6 +94,7 @@ namespace MultipleItemSelectorCustomControl
             if (suggestionlist.Items.Count > 0 && suggestionlist.SelectedIndex != -1) //&& !string.IsNullOrEmpty(NewItemText))
             {
                 IsSuggestionOpen = false;
+                NewItemText = ((ItemViewModel) suggestionlist.SelectedItem).Name;
                 NewItemTextCompleted = true;
                 NewItemText = string.Empty;
                 suggestionlist.SelectedIndex = -1;
