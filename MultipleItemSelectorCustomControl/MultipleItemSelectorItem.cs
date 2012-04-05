@@ -44,7 +44,7 @@ namespace MultipleItemSelectorCustomControl
             var newItemText = GetTemplateChild(PartNewItemText) as TextBox;
             if (newItemText == null) return;
             newItemText.KeyUp += TextboxOnPreviewKeyUp;
-            newItemText.IsKeyboardFocusWithinChanged += new DependencyPropertyChangedEventHandler(newItemText_MouseLeftButtonDown);
+            newItemText.IsMouseCapturedChanged += NewItemTextOnIsMouseCapturedChanged;
             newItemText.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
             newItemText.Focus();
             var tagBorder = GetTemplateChild(PartTagBorder) as Border;
@@ -55,8 +55,12 @@ namespace MultipleItemSelectorCustomControl
             MouseLeave += OnLeaveMouse;
         }
 
-        void newItemText_MouseLeftButtonDown(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        void NewItemTextOnIsMouseCapturedChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
+            var textbox = sender as TextBox;
+            if(textbox==null)
+                return;
+            IsSuggestionOpen = false;
             IsSuggestionOpen = true;
         }
 

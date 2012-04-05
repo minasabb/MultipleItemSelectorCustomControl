@@ -36,6 +36,9 @@
                 <Style
                     TargetType="{x:Type MultipleItemSelectorCustomControl:MultipleItemSelectorItem}">
                     <Setter
+                        Property="IsSuggestionOpen"
+                        Value="{Binding IsSuggestionOpen,RelativeSource={RelativeSource FindAncestor,AncestorType=MultipleItemSelectorCustomControl:MultipleItemSelectorAutoComplete}}" />
+                    <Setter
                         Property="Template"
                         Value="{StaticResource MultipleItemSelectorItemTemplate}" />
                 </Style>

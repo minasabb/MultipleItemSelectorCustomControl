@@ -490,6 +490,7 @@
             <TextBox
                 KeyboardNavigation.IsTabStop="False"
                 VerticalAlignment="Center"
+                MinWidth="50"
                 x:Name="PART_NewItemText"
                 Template="{StaticResource NewItemTextFocusedTemplate}"
                 Text="{Binding NewItemText, RelativeSource={RelativeSource AncestorType={x:Type MultipleItemSelectorCustomControl:MultipleItemSelector}}, UpdateSourceTrigger=PropertyChanged}" />
@@ -669,35 +670,14 @@
 
         </StackPanel>
         <ControlTemplate.Triggers>
-            <!--<MultiTrigger>
-                <MultiTrigger.Conditions>
-                    <Condition
-                        Property="IsFocused"
-                        Value="True" />
-                </MultiTrigger.Conditions>
+            <DataTrigger
+                Binding="{Binding ElementName=PART_SuggestionList, Path=Items.Count}"
+                Value="0">
                 <Setter
-                    TargetName="PART_Popup"
-                    Property="IsOpen"
-                    Value="True" />
-                <Setter
-                    TargetName="PART_Popup"
-                    Property="StaysOpen"
-                    Value="True" />
-            </MultiTrigger>-->
-            <!--MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition
-                        Binding="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"
-                        Value="True" />
-                    <Condition
-                        Binding="{Binding Path=IsSelected, RelativeSource={RelativeSource TemplatedParent}}"
-                        Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter
-                    TargetName="ExpanderImage"
-                    Property="Source"
-                    Value="..\Images\Icons\32x32\Green\Close.png" />
-            </MultiDataTrigger>  -->
+                    TargetName="PART_SuggestionList"
+                    Property="Visibility"
+                    Value="Collapsed" />
+            </DataTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

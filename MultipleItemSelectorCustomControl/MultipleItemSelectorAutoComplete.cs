@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using MultipleItemSelectorCustomControl.ViewModel;
 
@@ -13,12 +11,11 @@ namespace MultipleItemSelectorCustomControl
 {
     [TemplatePart(Name = PartNewItemText, Type = typeof(TextBox))]
     [TemplatePart(Name = PartSuggestionList, Type = typeof(ListBox))]
-    [TemplatePart(Name = PartPopup, Type = typeof(Popup))]
     public class MultipleItemSelectorAutoComplete: Control
     {
         private const string PartSuggestionList = "PART_SuggestionList";
         private const string PartNewItemText = "PART_NewItemText";
-        private const string PartPopup = "PART_Popup";
+
         IEnumerator<ItemViewModel> _matchingItemEnumerator;
 
         static MultipleItemSelectorAutoComplete()
@@ -32,10 +29,9 @@ namespace MultipleItemSelectorCustomControl
             KeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
         }
 
-        void TextboxIsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        void TextboxIsMouseCapturedChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
         {
             IsSuggestionOpen = true;
-            UpdateSuggestionList("");
         }
 
         static void SuggestionlistPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -63,8 +59,8 @@ namespace MultipleItemSelectorCustomControl
                 if(string.IsNullOrEmpty(NewItemText))
                 {
                     IsSuggestionOpen = true;
-                    if (suggestionlist.Items.Count<2)
-                        UpdateSuggestionList("");
+                    //if (suggestionlist.Items.Count<2)
+                    //    UpdateSuggestionList("");
                 }
                 if (e.Key == Key.Up && suggestionlist.SelectedIndex > 0)
                     suggestionlist.SelectedIndex = suggestionlist.SelectedIndex - 1;
@@ -213,7 +209,7 @@ namespace MultipleItemSelectorCustomControl
             var textbox = control.GetTemplateChild(PartNewItemText) as TextBox;
             if (textbox == null)
                 return;
-            textbox.IsMouseCapturedChanged += control.TextboxIsKeyboardFocusedChanged;
+            textbox.IsMouseCapturedChanged += control.TextboxIsMouseCapturedChanged;
            
         }
 

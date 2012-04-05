@@ -15,7 +15,6 @@ namespace MultipleItemSelectorCustomControl
         private const string PartTagButton = "PART_TagButton";
         private const string PartNewItemText = "PART_NewItemText";
         private const string PartItemsBorder = "PART_itemsBorder";
-        private const string PartChildrenPopup = "PART_ChildrenPopup";
 
         private int _itemsCount;
 
@@ -244,6 +243,7 @@ namespace MultipleItemSelectorCustomControl
             var currentItemSource = new ObservableCollection<ItemViewModel>(ItemsSource.Cast<ItemViewModel>().ToList());
             if (currentItemSource.Any() && index < currentItemSource.Count)
             {
+                NewItemText = null;
                 currentItemSource.RemoveAt(index);
                 ItemsSource = currentItemSource;
                 NewItemText = string.Empty;
