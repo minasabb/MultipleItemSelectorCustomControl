@@ -44,6 +44,7 @@ namespace MultipleItemSelectorCustomControl
             var newItemText = GetTemplateChild(PartNewItemText) as TextBox;
             if (newItemText == null) return;
             newItemText.KeyUp += TextboxOnPreviewKeyUp;
+            newItemText.IsKeyboardFocusWithinChanged += new DependencyPropertyChangedEventHandler(newItemText_MouseLeftButtonDown);
             newItemText.Visibility = _isLastItem ? Visibility.Visible : Visibility.Collapsed;
             newItemText.Focus();
             var tagBorder = GetTemplateChild(PartTagBorder) as Border;
@@ -52,6 +53,11 @@ namespace MultipleItemSelectorCustomControl
 
             
             MouseLeave += OnLeaveMouse;
+        }
+
+        void newItemText_MouseLeftButtonDown(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            IsSuggestionOpen = true;
         }
 
         void OnLeaveMouse(object sender, RoutedEventArgs e)
@@ -66,15 +72,17 @@ namespace MultipleItemSelectorCustomControl
         {
             var popup = GetTemplateChild(PartChildrenPopup) as Popup;
             if (popup == null) return;
+            var expanderText = GetTemplateChild(PartExpanderText) as TextBlock;
+            if (expanderText == null) return;
             if(popup.IsOpen)
             {
                 CloseChildrenPopup();
+                expanderText.Text = "+";
                 return;
             }
             popup.IsOpen = true;
             popup.StaysOpen = true;
-            var expanderText = GetTemplateChild(PartExpanderText) as TextBlock;
-            if (expanderText == null) return;
+            
             expanderText.Text =  "-";
         }
 
@@ -106,6 +114,22 @@ namespace MultipleItemSelectorCustomControl
             if (popup == null) return;
             popup.IsOpen = false;
             popup.StaysOpen = false;
+        }
+
+        public static readonly DependencyProperty IsSuggestionOpenProperty =
+            DependencyProperty.Register(
+                "IsSuggestionOpen",
+                typeof(bool),
+                typeof(MultipleItemSelectorItem),
+                new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+
+        public bool IsSuggestionOpen
+        {
+            get { return (bool)GetValue(IsSuggestionOpenProperty); }
+            set
+            {
+                SetValue(IsSuggestionOpenProperty, value);
+            }
         }
     }
 }

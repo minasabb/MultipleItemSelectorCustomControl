@@ -30,28 +30,13 @@ namespace MultipleItemSelectorCustomControl
         {
             SetResourceReference(StyleProperty, "MultipleItemSelectorAutoCompleteStyle");
             KeyUp +=MultipleItemSelectorAutoCompleteKeyUp;
-            //GotFocus += new RoutedEventHandler(MultipleItemSelectorAutoComplete_PreviewGotKeyboardFocus);
         }
 
-        //void MultipleItemSelectorAutoComplete_PreviewGotKeyboardFocus(object sender, RoutedEventArgs routedEventArgs)
-        //{
-        //    Debug.WriteLine("Before - isOpenSuggestion gotfocus " + IsSuggestionOpen);
-        //    IsSuggestionOpen = true;
-        //    Debug.WriteLine("After - isOpenSuggestion gotfocus " + IsSuggestionOpen);
-
-        //    if (string.IsNullOrEmpty(NewItemText))
-        //    {
-        //        var suggestionlist = GetTemplateChild(PartSuggestionList) as ListBox;
-        //        if (suggestionlist == null)
-        //            return;
-        //        IsSuggestionOpen = true;
-        //        suggestionlist.Focus();
-        //        if (suggestionlist.Items.Count == 1)
-        //            UpdateSuggestionList("");
-        //        suggestionlist.Focus();
-        //    }
-        //}
-
+        void TextboxIsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs dependencyPropertyChangedEventArgs)
+        {
+            IsSuggestionOpen = true;
+            UpdateSuggestionList("");
+        }
 
         static void SuggestionlistPreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -78,7 +63,7 @@ namespace MultipleItemSelectorCustomControl
                 if(string.IsNullOrEmpty(NewItemText))
                 {
                     IsSuggestionOpen = true;
-                    if (suggestionlist.Items.Count==1)
+                    if (suggestionlist.Items.Count<2)
                         UpdateSuggestionList("");
                 }
                 if (e.Key == Key.Up && suggestionlist.SelectedIndex > 0)
@@ -150,10 +135,10 @@ namespace MultipleItemSelectorCustomControl
                 if (Items==null || Items.Cast<ItemViewModel>().All(item => item.Id != _matchingItemEnumerator.Current.Id))
                     newFilteredList.Add(_matchingItemEnumerator.Current);
             }
-            suggestionlist.ItemsSource = newFilteredList;
+            FilteredSuggestionList = newFilteredList;
 
             //If no items hide the suggestion
-            if (suggestionlist.Items.Count == 0)
+            if (!newFilteredList.Any())
                 IsSuggestionOpen = false;
             else
                 suggestionlist.SelectedIndex = 0;
@@ -220,7 +205,16 @@ namespace MultipleItemSelectorCustomControl
         static void OnSuggestionListChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = d as MultipleItemSelectorAutoComplete;
-            if (control != null) control.FilteredSuggestionList = (IEnumerable) e.NewValue;
+            if (control == null)
+                return;
+                //control.FilteredSuggestionList = (IEnumerable) e.NewValue;
+             control.UpdateSuggestionList("");
+
+            var textbox = control.GetTemplateChild(PartNewItemText) as TextBox;
+            if (textbox == null)
+                return;
+            textbox.IsMouseCapturedChanged += control.TextboxIsKeyboardFocusedChanged;
+           
         }
 
         public IEnumerable SuggestionList
@@ -267,9 +261,7 @@ namespace MultipleItemSelectorCustomControl
             get { return (bool)GetValue(IsSuggestionOpenProperty); }
             set
             {
-                
                 SetValue(IsSuggestionOpenProperty, value);
-                Debug.WriteLine("After - isOpenSuggestion property " + value);
             }
         }
 
