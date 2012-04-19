@@ -124,13 +124,17 @@ namespace MultipleItemSelectorCustomControl
             //                                                 !(String.Equals(path.Name, filter, StringComparison.CurrentCultureIgnoreCase))));
             //};
             var newFilteredList = new ObservableCollection<ItemViewModel>();
-            if (_matchingItemEnumerator == null || !_matchingItemEnumerator.MoveNext())
-                VerifyMatchingPeopleEnumerator(filter,SuggestionList.Cast<ItemViewModel>().FirstOrDefault());
-            while (_matchingItemEnumerator != null && _matchingItemEnumerator.MoveNext())
+            foreach (var itemViewModel in SuggestionList)
             {
-                if (Items==null || Items.Cast<ItemViewModel>().All(item => item.Id != _matchingItemEnumerator.Current.Id))
-                    newFilteredList.Add(_matchingItemEnumerator.Current);
+                if (_matchingItemEnumerator == null || !_matchingItemEnumerator.MoveNext())
+                    VerifyMatchingPeopleEnumerator(filter, (ItemViewModel) itemViewModel);
+                while (_matchingItemEnumerator != null && _matchingItemEnumerator.MoveNext())
+                {
+                    if (Items == null || Items.Cast<ItemViewModel>().All(item => item.Id != _matchingItemEnumerator.Current.Id))
+                        newFilteredList.Add(_matchingItemEnumerator.Current);
+                }
             }
+            
             FilteredSuggestionList = newFilteredList;
 
             //If no items hide the suggestion
